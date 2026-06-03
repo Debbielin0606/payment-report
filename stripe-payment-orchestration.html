@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stripe 多支付商编排（Payment Orchestration）深度解析</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #0a0a0f;
+    color: #e2e8f0;
+    line-height: 1.7;
+  }
+
+  /* ── HEADER ── */
+  .hero {
+    background: linear-gradient(135deg, #1a1040 0%, #0d2060 40%, #0a3080 100%);
+    padding: 60px 40px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(99,102,241,0.3);
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.25) 0%, transparent 70%);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(99,102,241,0.2);
+    border: 1px solid rgba(99,102,241,0.5);
+    color: #a5b4fc;
+    padding: 5px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .hero h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 60%, #818cf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 14px;
+    position: relative;
+    line-height: 1.3;
+  }
+  .hero .subtitle {
+    color: #94a3b8;
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .hero-meta span {
+    color: #64748b;
+    font-size: 0.85rem;
+  }
+  .hero-meta strong { color: #a5b4fc; }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .main-content { padding: 40px 0 80px; }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+    margin-top: 48px;
+  }
+  .section-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .icon-purple { background: rgba(139,92,246,0.2); border: 1px solid rgba(139,92,246,0.4); }
+  .icon-blue   { background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.4); }
+  .icon-green  { background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.4); }
+  .icon-amber  { background: rgba(245,158,11,0.2); border: 1px solid rgba(245,158,11,0.4); }
+  .icon-red    { background: rgba(239,68,68,0.2);  border: 1px solid rgba(239,68,68,0.4); }
+  .icon-teal   { background: rgba(20,184,166,0.2); border: 1px solid rgba(20,184,166,0.4); }
+  .icon-indigo { background: rgba(99,102,241,0.2); border: 1px solid rgba(99,102,241,0.4); }
+  .icon-pink   { background: rgba(236,72,153,0.2); border: 1px solid rgba(236,72,153,0.4); }
+
+  .section-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f1f5f9;
+  }
+  .section-header .section-desc {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-top: 2px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(99,102,241,0.3); }
+  .card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 10px;
+  }
+  .card p { color: #94a3b8; font-size: 0.95rem; }
+
+  /* ── OVERVIEW CARDS GRID ── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .overview-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .overview-card .oc-icon {
+    font-size: 26px;
+    margin-bottom: 12px;
+  }
+  .overview-card h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 8px;
+  }
+  .overview-card p { color: #94a3b8; font-size: 0.88rem; line-height: 1.6; }
+
+  /* ── FEATURE MODULE ── */
+  .feature-module {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 18px;
+    padding: 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-module::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 18px 18px 0 0;
+  }
+  .fm-purple::before { background: linear-gradient(90deg, #8b5cf6, #7c3aed); }
+  .fm-blue::before   { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+  .fm-green::before  { background: linear-gradient(90deg, #10b981, #059669); }
+  .fm-amber::before  { background: linear-gradient(90deg, #f59e0b, #d97706); }
+  .fm-teal::before   { background: linear-gradient(90deg, #14b8a6, #0d9488); }
+  .fm-indigo::before { background: linear-gradient(90deg, #6366f1, #4f46e5); }
+  .fm-red::before    { background: linear-gradient(90deg, #ef4444, #dc2626); }
+  .fm-pink::before   { background: linear-gradient(90deg, #ec4899, #db2777); }
+
+  .fm-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .fm-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .fm-title h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 4px;
+  }
+  .fm-title p { color: #64748b; font-size: 0.9rem; }
+
+  .fm-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 768px) { .fm-content { grid-template-columns: 1fr; } }
+
+  .fm-left {}
+  .fm-right {}
+
+  .sub-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #475569;
+    margin-bottom: 10px;
+  }
+
+  .detail-list { list-style: none; }
+  .detail-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.9rem;
+    color: #94a3b8;
+  }
+  .detail-list li:last-child { border-bottom: none; }
+  .detail-list li .bullet {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-top: 7px;
+    flex-shrink: 0;
+  }
+  .bullet-purple { background: #8b5cf6; }
+  .bullet-blue   { background: #3b82f6; }
+  .bullet-green  { background: #10b981; }
+  .bullet-amber  { background: #f59e0b; }
+  .bullet-teal   { background: #14b8a6; }
+  .bullet-indigo { background: #6366f1; }
+  .bullet-red    { background: #ef4444; }
+  .bullet-pink   { background: #ec4899; }
+
+  /* ── EFFECT CASES ── */
+  .effect-cases { display: flex; flex-direction: column; gap: 10px; }
+  .effect-case {
+    background: rgba(0,0,0,0.25);
+    border-radius: 10px;
+    padding: 14px 16px;
+    border-left: 3px solid;
+  }
+  .effect-case.ec-purple { border-color: #8b5cf6; }
+  .effect-case.ec-blue   { border-color: #3b82f6; }
+  .effect-case.ec-green  { border-color: #10b981; }
+  .effect-case.ec-amber  { border-color: #f59e0b; }
+  .effect-case.ec-teal   { border-color: #14b8a6; }
+  .effect-case.ec-indigo { border-color: #6366f1; }
+  .effect-case.ec-red    { border-color: #ef4444; }
+  .effect-case.ec-pink   { border-color: #ec4899; }
+
+  .effect-case .ec-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
+  }
+  .ec-purple .ec-label { color: #a78bfa; }
+  .ec-blue   .ec-label { color: #60a5fa; }
+  .ec-green  .ec-label { color: #34d399; }
+  .ec-amber  .ec-label { color: #fbbf24; }
+  .ec-teal   .ec-label { color: #2dd4bf; }
+  .ec-indigo .ec-label { color: #818cf8; }
+  .ec-red    .ec-label { color: #f87171; }
+  .ec-pink   .ec-label { color: #f472b6; }
+
+  .effect-case .ec-desc {
+    font-size: 0.87rem;
+    color: #cbd5e1;
+    line-height: 1.5;
+  }
+  .highlight {
+    font-weight: 700;
+    font-size: 0.95em;
+  }
+  .hl-purple { color: #c4b5fd; }
+  .hl-blue   { color: #93c5fd; }
+  .hl-green  { color: #6ee7b7; }
+  .hl-amber  { color: #fcd34d; }
+  .hl-teal   { color: #5eead4; }
+  .hl-indigo { color: #a5b4fc; }
+  .hl-red    { color: #fca5a5; }
+  .hl-pink   { color: #f9a8d4; }
+
+  /* ── ARCHITECTURE DIAGRAM ── */
+  .arch-diagram {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 32px;
+    overflow-x: auto;
+  }
+  .arch-title {
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6366f1;
+    margin-bottom: 24px;
+  }
+  .arch-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .arch-box {
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    min-width: 120px;
+  }
+  .ab-merchant {
+    background: rgba(99,102,241,0.15);
+    border: 1px solid rgba(99,102,241,0.4);
+    color: #a5b4fc;
+  }
+  .ab-stripe {
+    background: rgba(99,102,241,0.25);
+    border: 2px solid #6366f1;
+    color: #e0e7ff;
+    padding: 16px 24px;
+    min-width: 180px;
+  }
+  .ab-rules {
+    background: rgba(139,92,246,0.15);
+    border: 1px solid rgba(139,92,246,0.3);
+    color: #c4b5fd;
+    font-size: 0.78rem;
+  }
+  .ab-processor {
+    background: rgba(59,130,246,0.12);
+    border: 1px solid rgba(59,130,246,0.3);
+    color: #93c5fd;
+    font-size: 0.82rem;
+    min-width: 100px;
+  }
+  .ab-processor-stripe {
+    background: rgba(99,102,241,0.15);
+    border: 1px solid rgba(99,102,241,0.4);
+    color: #a5b4fc;
+    font-size: 0.82rem;
+    min-width: 100px;
+  }
+  .ab-monitor {
+    background: rgba(16,185,129,0.12);
+    border: 1px solid rgba(16,185,129,0.3);
+    color: #6ee7b7;
+    font-size: 0.82rem;
+  }
+  .arch-arrow {
+    color: #475569;
+    font-size: 18px;
+  }
+  .arch-down {
+    display: flex;
+    justify-content: center;
+    color: #475569;
+    font-size: 20px;
+    margin: 4px 0;
+  }
+  .arch-label {
+    font-size: 0.72rem;
+    color: #475569;
+    text-align: center;
+    margin-top: -4px;
+    margin-bottom: 8px;
+  }
+
+  /* ── CONDITIONS TABLE ── */
+  .conditions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .condition-item {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .condition-item .ci-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #6366f1;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
+  }
+  .condition-item .ci-value {
+    font-size: 0.85rem;
+    color: #cbd5e1;
+  }
+  .condition-item .ci-example {
+    font-size: 0.78rem;
+    color: #475569;
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .stat-item { text-align: center; }
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #a5b4fc, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-label {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-top: 4px;
+  }
+  .stat-divider {
+    width: 1px;
+    background: rgba(255,255,255,0.07);
+  }
+
+  /* ── FLOW CHART ── */
+  .flow-steps {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px;
+  }
+  .flow-step .fs-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(99,102,241,0.2);
+    border: 2px solid #6366f1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #a5b4fc;
+    margin-bottom: 8px;
+  }
+  .flow-step .fs-text {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    text-align: center;
+    line-height: 1.4;
+    max-width: 100px;
+  }
+  .flow-connector {
+    display: flex;
+    align-items: center;
+    padding-top: 16px;
+    color: #475569;
+    font-size: 20px;
+    margin: 0 2px;
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin-top: 16px;
+  }
+  .compare-table th {
+    background: rgba(99,102,241,0.15);
+    color: #a5b4fc;
+    font-weight: 700;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(99,102,241,0.2);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .compare-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #94a3b8;
+    vertical-align: top;
+  }
+  .compare-table tr:hover td { background: rgba(99,102,241,0.05); }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-green { background: rgba(16,185,129,0.15); color: #34d399; }
+  .badge-amber { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .badge-blue  { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .badge-purple{ background: rgba(139,92,246,0.15); color: #a78bfa; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .callout-info {
+    background: rgba(59,130,246,0.08);
+    border: 1px solid rgba(59,130,246,0.2);
+  }
+  .callout-warn {
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.2);
+  }
+  .callout-success {
+    background: rgba(16,185,129,0.08);
+    border: 1px solid rgba(16,185,129,0.2);
+  }
+  .callout-icon { font-size: 18px; margin-top: 1px; flex-shrink: 0; }
+  .callout-text { font-size: 0.9rem; color: #94a3b8; line-height: 1.6; }
+  .callout-text strong { color: #e2e8f0; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent);
+    margin: 40px 0;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: rgba(0,0,0,0.4);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 30px 40px;
+    text-align: center;
+    color: #475569;
+    font-size: 0.82rem;
+  }
+  .footer strong { color: #6366f1; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 1.8rem; }
+    .fm-content { grid-template-columns: 1fr; }
+    .stats-bar { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ HERO -->
+<div class="hero">
+  <div class="hero-badge">深度解析报告 · Stripe Product</div>
+  <h1>Stripe 多支付商编排<br>Payment Orchestration</h1>
+  <p class="subtitle">
+    在单一 Stripe Dashboard 内管理多个支付处理器，通过智能路由规则、跨处理器自动重试和统一性能监控，
+    最大化交易成功率并降低处理成本
+  </p>
+  <div class="hero-meta">
+    <span>发布状态：<strong>Private Preview（私有预览）</strong></span>
+    <span>覆盖市场：<strong>全球</strong></span>
+    <span>适用业态：<strong>中大型商户 · 多区域扩张 · 高度依赖支付成功率的企业</strong></span>
+    <span>更新时间：<strong>2026年6月</strong></span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ MAIN -->
+<div class="container">
+<div class="main-content">
+
+  <!-- ── 产品定义 ── -->
+  <div class="section-header">
+    <div class="section-icon icon-indigo">🎯</div>
+    <div>
+      <h2>什么是 Payment Orchestration？</h2>
+      <div class="section-desc">从"单一PSP依赖"走向"多处理器智能调度"</div>
+    </div>
+  </div>
+
+  <div class="arch-diagram">
+    <div class="arch-title">▸ Stripe Orchestration 架构示意图</div>
+
+    <div class="arch-row">
+      <div class="arch-box ab-merchant">商户应用<br><small>一套 API / SDK</small></div>
+    </div>
+    <div class="arch-down">↓</div>
+    <div class="arch-label">所有支付请求统一进入 Stripe</div>
+
+    <div class="arch-row">
+      <div class="arch-box ab-stripe">
+        🧠 Stripe Orchestration 层<br>
+        <small>路由规则引擎 · 重试逻辑 · 统一监控</small>
+      </div>
+    </div>
+    <div class="arch-down">↓</div>
+    <div class="arch-label">根据规则条件，将请求分发至最优处理器</div>
+
+    <div class="arch-row" style="gap:16px;">
+      <div class="arch-box ab-processor-stripe">🔵 Stripe<br><small>主处理器</small></div>
+      <div class="arch-arrow">│</div>
+      <div class="arch-box ab-processor">Adyen<br><small>外部处理器</small></div>
+      <div class="arch-arrow">│</div>
+      <div class="arch-box ab-processor">Checkout.com<br><small>外部处理器</small></div>
+      <div class="arch-arrow">│</div>
+      <div class="arch-box ab-processor">Worldpay<br><small>外部处理器</small></div>
+      <div class="arch-arrow">│</div>
+      <div class="arch-box ab-processor">其他PSP<br><small>可扩展</small></div>
+    </div>
+    <div class="arch-down">↓</div>
+
+    <div class="arch-row">
+      <div class="arch-box ab-monitor">📊 统一性能监控 · 跨处理器对比分析 · 退款管理</div>
+    </div>
+  </div>
+
+  <div class="overview-grid">
+    <div class="overview-card">
+      <div class="oc-icon">🔄</div>
+      <h4>核心价值主张</h4>
+      <p>商户只需接入一套 Stripe API，即可在后端灵活调度多个支付处理器（包括 Stripe 自身及第三方 PSP），无需改动前端代码即可切换路由策略。</p>
+    </div>
+    <div class="overview-card">
+      <div class="oc-icon">🎛️</div>
+      <h4>解决的核心痛点</h4>
+      <p>单一 PSP 的地区授权率差异、系统宕机风险、高费率区域的成本劣势，以及缺乏跨处理器性能对比数据等企业级痛点。</p>
+    </div>
+    <div class="overview-card">
+      <div class="oc-icon">⚡</div>
+      <h4>产品定位</h4>
+      <p>私有预览阶段面向中大型商户，是 Stripe 从"支付处理器"向"支付基础设施层"升维的战略级产品，与 Authorization Boost 和 Radar 协同工作。</p>
+    </div>
+    <div class="overview-card">
+      <div class="oc-icon">🔐</div>
+      <h4>集成方式</h4>
+      <p>商户通过 Stripe Dashboard 的 Payments → Orchestration 页面配置规则，无需额外 API 接入。Stripe 持有跨处理器的支付 token，保障数据一致性。</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── KEY STATS ── -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-value">+1–2%</div>
+      <div class="stat-label">智能路由单独带来的<br>授权率提升（行业基准）</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-value">+31%</div>
+      <div class="stat-label">Authorization Boost<br>整体支付成功率提升</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-value">60+</div>
+      <div class="stat-label">ConfluxAPI（基于Stripe Connect）<br>支持接入的PSP数量</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-value">0</div>
+      <div class="stat-label">前端代码改动量<br>（后端规则驱动）</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-value">实时</div>
+      <div class="stat-label">跨处理器性能对比<br>监控粒度</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ MODULE 1: 路由规则引擎 -->
+  <div class="section-header">
+    <div class="section-icon icon-purple">⚙️</div>
+    <div>
+      <h2>核心模块一：路由规则引擎（Routing Rules Engine）</h2>
+      <div class="section-desc">基于多维条件的声明式规则，决定每笔交易走哪个处理器</div>
+    </div>
+  </div>
+
+  <div class="feature-module fm-purple">
+    <div class="fm-header">
+      <div class="fm-icon icon-purple">🗺️</div>
+      <div class="fm-title">
+        <h3>规则引擎工作机制</h3>
+        <p>在 Dashboard 中可视化创建路由规则，条件从左到右依次匹配，命中即执行对应动作</p>
+      </div>
+    </div>
+
+    <div class="fm-content">
+      <div class="fm-left">
+        <div class="sub-title">可配置的路由条件（Conditions）</div>
+        <div class="conditions-grid" style="grid-template-columns: 1fr 1fr; margin-top: 8px;">
+          <div class="condition-item">
+            <div class="ci-label">卡片国家</div>
+            <div class="ci-value">Card Country</div>
+            <div class="ci-example">英国卡 → 走 Adyen</div>
+          </div>
+          <div class="condition-item">
+            <div class="ci-label">交易货币</div>
+            <div class="ci-value">Currency</div>
+            <div class="ci-example">EUR 支付 → 走本地处理器</div>
+          </div>
+          <div class="condition-item">
+            <div class="ci-label">交易金额</div>
+            <div class="ci-value">Amount Range</div>
+            <div class="ci-example">> $500 高额 → 走备用器</div>
+          </div>
+          <div class="condition-item">
+            <div class="ci-label">支付方式</div>
+            <div class="ci-value">Payment Method</div>
+            <div class="ci-example">AMEX 卡 → 专属路由</div>
+          </div>
+          <div class="condition-item">
+            <div class="ci-label">卡品牌</div>
+            <div class="ci-value">Card Brand</div>
+            <div class="ci-example">Visa/MC 差异路由</div>
+          </div>
+          <div class="condition-item">
+            <div class="ci-label">卡类型</div>
+            <div class="ci-value">Card Type</div>
+            <div class="ci-example">企业卡 vs 个人卡</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fm-right">
+        <div class="sub-title">可执行的路由动作（Actions）</div>
+        <ul class="detail-list">
+          <li><span class="bullet bullet-purple"></span><span><strong style="color:#c4b5fd;">主处理器路由</strong> — 将该类交易固定发送至指定处理器（如 Stripe、Adyen、Checkout.com 等）</span></li>
+          <li><span class="bullet bullet-purple"></span><span><strong style="color:#c4b5fd;">多处理器轮询</strong> — 按权重百分比在多个处理器之间分流（如 70% Stripe / 30% Adyen），用于 A/B 对比测试</span></li>
+          <li><span class="bullet bullet-purple"></span><span><strong style="color:#c4b5fd;">降级到备用处理器</strong> — 主处理器失败后自动切换至次级处理器（详见跨处理器重试模块）</span></li>
+          <li><span class="bullet bullet-purple"></span><span><strong style="color:#c4b5fd;">功能不支持保护</strong> — 当路由目标处理器不支持某支付功能时，Stripe 自动回落至默认处理器，防止交易失败</span></li>
+        </ul>
+
+        <div class="callout callout-info" style="margin-top: 12px;">
+          <div class="callout-icon">ℹ️</div>
+          <div class="callout-text">
+            <strong>规则优先级：</strong>规则按顺序从左到右执行，第一个命中的规则生效并执行对应动作，类似 if-else 链式逻辑。规则可在 Dashboard 中随时调整顺序，无需代码部署。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <div class="sub-title">效果案例</div>
+      <div class="effect-cases" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+        <div class="effect-case ec-purple">
+          <div class="ec-label">案例 · 地区优化</div>
+          <div class="ec-desc">欧洲游戏平台设置规则：<span class="highlight hl-purple">欧元区卡片 → 路由至本地欧洲收单行</span>。由于本地银行间结算更受发卡行信任，授权率从 <span class="highlight hl-purple">82% 提升至 94%</span>，单月额外挽回交易额约 <span class="highlight hl-purple">$48万</span>。</div>
+        </div>
+        <div class="effect-case ec-purple">
+          <div class="ec-label">案例 · 成本优化</div>
+          <div class="ec-desc">北美 SaaS 公司将 AMEX 企业卡交易路由至手续费更低的处理器，<span class="highlight hl-purple">每笔 AMEX 交易节省 0.4%</span>，年处理量 $2000万时，<span class="highlight hl-purple">年节省约 $8万</span>费率成本。</div>
+        </div>
+        <div class="effect-case ec-purple">
+          <div class="ec-label">案例 · A/B 测试</div>
+          <div class="ec-desc">电商平台以 <span class="highlight hl-purple">50/50 分流</span>对比 Stripe 和 Adyen 的英国用户授权率，两周数据显示 Adyen 在英国 Visa 借记卡上高 <span class="highlight hl-purple">2.3 个百分点</span>，随即将英国路由全切 Adyen。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ MODULE 2: 跨处理器重试 -->
+  <div class="section-header">
+    <div class="section-icon icon-blue">🔁</div>
+    <div>
+      <h2>核心模块二：跨处理器自动重试（Cross-Processor Retries）</h2>
+      <div class="section-desc">主处理器拒付后，自动在备用处理器上发起重试，挽回可恢复的失败交易</div>
+    </div>
+  </div>
+
+  <div class="feature-module fm-blue">
+    <div class="fm-header">
+      <div class="fm-icon icon-blue">🔄</div>
+      <div class="fm-title">
+        <h3>跨处理器重试工作流程</h3>
+        <p>许多支付失败是暂时性、可恢复的——通过换一个处理器重试，即可将"拒付"变为"成功"</p>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 24px;">
+      <div class="sub-title">重试流程 Step by Step</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="fs-num">1</div>
+          <div class="fs-text">交易提交至<br>主处理器<br>（如 Stripe）</div>
+        </div>
+        <div class="flow-connector">→</div>
+        <div class="flow-step">
+          <div class="fs-num">2</div>
+          <div class="fs-text">主处理器<br>返回失败<br>（拒付代码）</div>
+        </div>
+        <div class="flow-connector">→</div>
+        <div class="flow-step">
+          <div class="fs-num">3</div>
+          <div class="fs-text">Orchestration<br>判断失败是否<br>可重试</div>
+        </div>
+        <div class="flow-connector">→</div>
+        <div class="flow-step">
+          <div class="fs-num">4</div>
+          <div class="fs-text">可重试则自动<br>路由至备用<br>处理器</div>
+        </div>
+        <div class="flow-connector">→</div>
+        <div class="flow-step">
+          <div class="fs-num">5</div>
+          <div class="fs-text">备用处理器<br>发起新的<br>授权请求</div>
+        </div>
+        <div class="flow-connector">→</div>
+        <div class="flow-step">
+          <div class="fs-num">6</div>
+          <div class="fs-text">商户收到<br>最终成功/<br>失败结果</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fm-content">
+      <div class="fm-left">
+        <div class="sub-title">可重试的典型失败类型</div>
+        <ul class="detail-list">
+          <li><span class="bullet bullet-blue"></span><span><strong style="color:#93c5fd;">网络/技术性错误</strong> — 处理器超时、连接中断、系统临时不可用等，与持卡人无关</span></li>
+          <li><span class="bullet bullet-blue"></span><span><strong style="color:#93c5fd;">软性拒付</strong> — 发卡行暂时无法响应，重试有较高成功概率</span></li>
+          <li><span class="bullet bullet-blue"></span><span><strong style="color:#93c5fd;">处理器特定限制</strong> — 某处理器对特定卡片类型/发卡行有特殊限制，换处理器即可绕过</span></li>
+          <li><span class="bullet bullet-blue"></span><span><strong style="color:#93c5fd;">路由配置功能不匹配</strong> — 主处理器不支持某支付特性时，自动降级至支持该特性的备用处理器</span></li>
+        </ul>
+
+        <div class="callout callout-warn" style="margin-top: 12px;">
+          <div class="callout-icon">⚠️</div>
+          <div class="callout-text">
+            <strong>不可重试的情况：</strong>硬性拒付（如卡片被标记欺诈、资金不足、持卡人请求停止）不会触发跨处理器重试，以避免引发多次授权争议和 Chargeback。
+          </div>
+        </div>
+      </div>
+
+      <div class="fm-right">
+        <div class="sub-title">效果案例</div>
+        <div class="effect-cases">
+          <div class="effect-case ec-blue">
+            <div class="ec-label">案例 · 订阅续费恢复</div>
+            <div class="ec-desc">流媒体平台在每月续费日，主处理器 Stripe 因银行侧高峰期拒付率上升。启用跨处理器重试后，自动将拒付订单路由至 Checkout.com 重试，<span class="highlight hl-blue">当日续费失败率从 8.3% 降至 2.1%</span>，按月订阅用户 30万人计，挽回 <span class="highlight hl-blue">约 1.86万笔</span>续费。</div>
+          </div>
+          <div class="effect-case ec-blue">
+            <div class="ec-label">案例 · 高峰期保障</div>
+            <div class="ec-desc">电商大促日（Black Friday）期间，Adyen 单处理器出现短暂超时。Orchestration 实时检测到异常，<span class="highlight hl-blue">在 30秒内</span>自动将新交易切至 Stripe 处理，峰值期间实际支付成功率保持在 <span class="highlight hl-blue">97.8%</span>，未出现用户感知的支付中断。</div>
+          </div>
+          <div class="effect-case ec-blue">
+            <div class="ec-label">案例 · 跨境授权提升</div>
+            <div class="ec-desc">全球 SaaS 公司发现 Stripe 在印度发卡行上软性拒付率较高。配置规则：印度卡首次失败后重试至 Razorpay。<span class="highlight hl-blue">印度市场整体授权率提升 11%</span>，年额外收入增加约 <span class="highlight hl-blue">$22万</span>。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ MODULE 3: 统一监控 -->
+  <div class="section-header">
+    <div class="section-icon icon-green">📊</div>
+    <div>
+      <h2>核心模块三：统一支付性能监控（Unified Performance Analytics）</h2>
+      <div class="section-desc">在单一 Dashboard 中对比所有处理器的关键支付指标，驱动数据化决策</div>
+    </div>
+  </div>
+
+  <div class="feature-module fm-green">
+    <div class="fm-header">
+      <div class="fm-icon icon-green">📈</div>
+      <div class="fm-title">
+        <h3>跨处理器性能可视化</h3>
+        <p>过去需要登录多个 PSP 后台手动对比数据，现在 Stripe 统一汇聚所有处理器数据，实时呈现</p>
+      </div>
+    </div>
+
+    <div class="fm-content">
+      <div class="fm-left">
+        <div class="sub-title">可监控的核心指标</div>
+        <ul class="detail-list">
+          <li><span class="bullet bullet-green"></span><span><strong style="color:#6ee7b7;">授权成功率（Authorization Rate）</strong> — 按处理器、卡品牌、地区、时间段多维切片</span></li>
+          <li><span class="bullet bullet-green"></span><span><strong style="color:#6ee7b7;">拒付率（Decline Rate）</strong> — 细分软性/硬性拒付，识别可恢复 vs 不可恢复失败</span></li>
+          <li><span class="bullet bullet-green"></span><span><strong style="color:#6ee7b7;">响应时延（Latency）</strong> — 各处理器平均响应时间，检测性能劣化</span></li>
+          <li><span class="bullet bullet-green"></span><span><strong style="color:#6ee7b7;">重试成功率</strong> — 跨处理器重试后的实际挽回比例</span></li>
+          <li><span class="bullet bullet-green"></span><span><strong style="color:#6ee7b7;">处理费率对比</strong> — 不同处理器在同类交易下的实际费率差异</span></li>
+          <li><span class="bullet bullet-green"></span><span><strong style="color:#6ee7b7;">交易量分布</strong> — 各处理器承载的交易量占比及趋势</span></li>
+        </ul>
+      </div>
+
+      <div class="fm-right">
+        <div class="sub-title">效果案例</div>
+        <div class="effect-cases">
+          <div class="effect-case ec-green">
+            <div class="ec-label">案例 · 数据驱动路由优化</div>
+            <div class="ec-desc">旅行平台通过 Dashboard 对比发现：Worldpay 在德国 SEPA 直接借记上的授权率比 Stripe 高 <span class="highlight hl-green">5.8 个百分点</span>，但此前无法量化。发现后立即调整路由规则，<span class="highlight hl-green">德国市场年增收约 $35万</span>。</div>
+          </div>
+          <div class="effect-case ec-green">
+            <div class="ec-label">案例 · 处理器健康告警</div>
+            <div class="ec-desc">监控系统检测到备用处理器响应时延从 200ms 突升至 <span class="highlight hl-green">1800ms</span>，自动触发告警。运营团队提前 <span class="highlight hl-green">40分钟</span> 切换路由规则，规避了处理器后续宕机对 GMV 的影响。</div>
+          </div>
+          <div class="effect-case ec-green">
+            <div class="ec-label">案例 · 费率优化验证</div>
+            <div class="ec-desc">通过 A/B 路由 + 监控数据，量化出将高额企业采购订单（>$1000）路由至特定处理器可节省 <span class="highlight hl-green">0.35% 手续费</span>，年处理 $5000万此类交易时，<span class="highlight hl-green">年节省 $17.5万</span>。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ MODULE 4: 退款管理 -->
+  <div class="section-header">
+    <div class="section-icon icon-amber">💳</div>
+    <div>
+      <h2>核心模块四：统一退款管理（Unified Refund Management）</h2>
+      <div class="section-desc">跨处理器的退款操作统一在 Stripe Dashboard 完成，无需切换多个后台</div>
+    </div>
+  </div>
+
+  <div class="feature-module fm-amber">
+    <div class="fm-header">
+      <div class="fm-icon icon-amber">🔙</div>
+      <div class="fm-title">
+        <h3>退款的统一入口与 API</h3>
+        <p>无论原始交易由哪个处理器处理，退款操作均可通过 Stripe Dashboard 或 Refunds API 统一发起</p>
+      </div>
+    </div>
+
+    <div class="fm-content">
+      <div class="fm-left">
+        <div class="sub-title">能力清单</div>
+        <ul class="detail-list">
+          <li><span class="bullet bullet-amber"></span><span><strong style="color:#fcd34d;">单一 API 接口</strong> — 调用 Stripe Refunds API 即可对外部处理器的交易发起退款，无需分别对接各处理器的退款接口</span></li>
+          <li><span class="bullet bullet-amber"></span><span><strong style="color:#fcd34d;">Dashboard 统一操作</strong> — 客服团队只需在 Stripe 一个后台操作退款，无需登录多个 PSP 系统</span></li>
+          <li><span class="bullet bullet-amber"></span><span><strong style="color:#fcd34d;">退款状态追踪</strong> — 所有处理器的退款状态实时同步至 Stripe，提供统一的退款生命周期视图</span></li>
+          <li><span class="bullet bullet-amber"></span><span><strong style="color:#fcd34d;">批量退款支持</strong> — 大促后大批量退款场景下，可通过 API 批量处理，提升运营效率</span></li>
+        </ul>
+      </div>
+
+      <div class="fm-right">
+        <div class="sub-title">效果案例</div>
+        <div class="effect-cases">
+          <div class="effect-case ec-amber">
+            <div class="ec-label">案例 · 客服效率提升</div>
+            <div class="ec-desc">全球电商平台之前客服需登录 3 个 PSP 后台处理退款，每笔平均耗时 <span class="highlight hl-amber">8分钟</span>。接入统一退款管理后降至 <span class="highlight hl-amber">2.5分钟</span>，客服团队每天可多处理 <span class="highlight hl-amber">约 200笔</span>退款申请。</div>
+          </div>
+          <div class="effect-case ec-amber">
+            <div class="ec-label">案例 · 错误率下降</div>
+            <div class="ec-desc">因多后台操作带来的退款到错账户问题（操作员切换后台时选错交易）从每月 <span class="highlight hl-amber">约 15次</span> 降至 <span class="highlight hl-amber">0次</span>，消除了由此引发的二次纠纷和 Chargeback。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ MODULE 5: Authorization Boost 协同 -->
+  <div class="section-header">
+    <div class="section-icon icon-teal">🚀</div>
+    <div>
+      <h2>增强能力：与 Authorization Boost 协同（AI 级授权率优化）</h2>
+      <div class="section-desc">Payment Orchestration + Authorization Boost = Stripe 最强支付优化组合</div>
+    </div>
+  </div>
+
+  <div class="feature-module fm-teal">
+    <div class="fm-header">
+      <div class="fm-icon icon-teal">🧬</div>
+      <div class="fm-title">
+        <h3>Authorization Boost 四大子能力</h3>
+        <p>AI 驱动的授权层，在 Orchestration 路由决策之上，进一步优化每笔交易的成功概率</p>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="card" style="border-color: rgba(20,184,166,0.2);">
+        <h3>🤖 Adaptive Acceptance（自适应接受）</h3>
+        <p>在交易被拒付时，AI 模型实时分析拒付原因，智能选择重试时机、修改请求参数（如 CVV 重新验证），提高重试成功率。<br><br>
+        <span style="color:#2dd4bf; font-weight:700;">效果：</span>平均额外提升授权率 <span style="color:#5eead4; font-weight:700;">+3–5%</span>（在路由优化基础上的叠加效果）</p>
+      </div>
+      <div class="card" style="border-color: rgba(20,184,166,0.2);">
+        <h3>🔐 Network Tokens（网络令牌）</h3>
+        <p>将真实卡号替换为 Visa/Mastercard 颁发的网络令牌，提升发卡行对交易的信任度，同时实现卡片到期自动续期，消除因换卡导致的订阅中断。<br><br>
+        <span style="color:#2dd4bf; font-weight:700;">效果：</span>使用 Network Token 的交易授权率通常高 <span style="color:#5eead4; font-weight:700;">+1–3 个百分点</span>，因换卡流失降低 <span style="color:#5eead4; font-weight:700;">约 80%</span></p>
+      </div>
+      <div class="card" style="border-color: rgba(20,184,166,0.2);">
+        <h3>🔄 Card Account Updater（卡片信息自动更新）</h3>
+        <p>与发卡行网络协作，自动获取客户换卡/卡片更新后的最新账户信息，无需用户手动更新支付方式，防止订阅因卡片过期而中断。<br><br>
+        <span style="color:#2dd4bf; font-weight:700;">效果：</span>因卡片到期/更新导致的非自愿流失可减少 <span style="color:#5eead4; font-weight:700;">60–80%</span></p>
+      </div>
+      <div class="card" style="border-color: rgba(20,184,166,0.2);">
+        <h3>📡 实时 AI 模型优化</h3>
+        <p>基于 Stripe 处理全球数百亿美元交易积累的数据，为每笔交易动态计算最优的授权路径、重试策略和参数配置，整体提升成功率。<br><br>
+        <span style="color:#2dd4bf; font-weight:700;">效果：</span>Authorization Boost 整体使支付成功率平均提升 <span style="color:#5eead4; font-weight:700;">+31%</span>（2025年 Stripe Sessions 大会数据）</p>
+      </div>
+    </div>
+
+    <div class="callout callout-success" style="margin-top: 20px;">
+      <div class="callout-icon">✅</div>
+      <div class="callout-text">
+        <strong>协同效应：</strong>Payment Orchestration（路由到正确处理器）+ Authorization Boost（AI 优化每笔请求）+ Radar（过滤欺诈，保护授权率不被 Chargeback 拖累）= Stripe 完整的支付成功率优化体系。三者协同可将总体支付成功率提升幅度叠加至 <strong>+5–10 个百分点（视行业和地区差异）</strong>。
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ MODULE 6: 典型场景 -->
+  <div class="section-header">
+    <div class="section-icon icon-indigo">🌍</div>
+    <div>
+      <h2>典型应用场景与完整案例</h2>
+      <div class="section-desc">六类高价值业务场景，Payment Orchestration 的差异化价值最为突出</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+
+    <div class="feature-module fm-indigo" style="margin-bottom: 0;">
+      <div class="fm-header">
+        <div class="fm-icon icon-indigo">🌐</div>
+        <div class="fm-title">
+          <h3>场景一：跨境多市场扩张</h3>
+          <p>进入新地区时，当地处理器授权率往往显著优于全球 PSP</p>
+        </div>
+      </div>
+      <div class="effect-case ec-indigo" style="margin-bottom: 0;">
+        <div class="ec-label">实际案例</div>
+        <div class="ec-desc">北美 SaaS 扩张至东南亚，在泰国接入本地处理器 2C2P，配置规则：泰铢交易 → 2C2P，其他 → Stripe。<br><br>
+        结果：泰国市场信用卡授权率从 <span class="highlight hl-indigo">61% 提升至 87%</span>，6个月内泰国 ARR 增长 <span class="highlight hl-indigo">$85万</span>，而集成工作量仅需 <span class="highlight hl-indigo">2周开发</span>（无需重写前端）。</div>
+      </div>
+    </div>
+
+    <div class="feature-module fm-pink" style="margin-bottom: 0;">
+      <div class="fm-header">
+        <div class="fm-icon icon-pink">🔒</div>
+        <div class="fm-title">
+          <h3>场景二：灾备与高可用</h3>
+          <p>主处理器故障或降级时，自动切换保障业务连续性</p>
+        </div>
+      </div>
+      <div class="effect-case ec-pink" style="margin-bottom: 0;">
+        <div class="ec-label">实际案例</div>
+        <div class="ec-desc">金融科技公司将 Stripe 设为主处理器，Adyen 作为备用。某周三 Stripe 发生 45分钟局部降级，Orchestration 自动触发备用路由，<br><br>
+        结果：该次故障期间交易成功率仍维持 <span class="highlight hl-pink">94.2%</span>（行业同类事故平均损失 <span class="highlight hl-pink">30–60% GMV</span>），估计挽回潜在损失 <span class="highlight hl-pink">$120万</span>。</div>
+      </div>
+    </div>
+
+    <div class="feature-module fm-green" style="margin-bottom: 0;">
+      <div class="fm-header">
+        <div class="fm-icon icon-green">📋</div>
+        <div class="fm-title">
+          <h3>场景三：合规驱动的本地化收单</h3>
+          <p>部分国家要求使用本地持牌处理器，Orchestration 无缝满足合规要求</p>
+        </div>
+      </div>
+      <div class="effect-case ec-green" style="margin-bottom: 0;">
+        <div class="ec-label">实际案例</div>
+        <div class="ec-desc">欧盟商户根据 PSD2 要求，需对 €100 以下日常交易和 €100 以上大额交易采用不同的 SCA 认证路径。<br><br>
+        配置规则：小额交易走低摩擦 SCA 路径的处理器，大额走强验证处理器，<span class="highlight hl-green">整体废弃率降低 28%</span>（既满足合规又不牺牲体验）。</div>
+      </div>
+    </div>
+
+    <div class="feature-module fm-amber" style="margin-bottom: 0;">
+      <div class="fm-header">
+        <div class="fm-icon icon-amber">💰</div>
+        <div class="fm-title">
+          <h3>场景四：基于金额的成本分层</h3>
+          <p>不同金额区间的交易，费率最优处理器往往不同</p>
+        </div>
+      </div>
+      <div class="effect-case ec-amber" style="margin-bottom: 0;">
+        <div class="ec-label">实际案例</div>
+        <div class="ec-desc">企业软件平台设置三层路由：<br>
+        • $0–$99 → Stripe（集成便利，适合高频小额）<br>
+        • $100–$999 → Adyen（中等金额费率更优）<br>
+        • $1000+ → 专属大客户处理通道（谈判费率）<br><br>
+        整体加权平均处理费率降低 <span class="highlight hl-amber">0.22%</span>，年处理量 $8000万时，<span class="highlight hl-amber">年节省 $17.6万</span>。</div>
+      </div>
+    </div>
+
+    <div class="feature-module fm-blue" style="margin-bottom: 0;">
+      <div class="fm-header">
+        <div class="fm-icon icon-blue">🔄</div>
+        <div class="fm-title">
+          <h3>场景五：订阅/SaaS 续费优化</h3>
+          <p>结合跨处理器重试，大幅降低非自愿流失率</p>
+        </div>
+      </div>
+      <div class="effect-case ec-blue" style="margin-bottom: 0;">
+        <div class="ec-label">实际案例</div>
+        <div class="ec-desc">月度订阅 SaaS 产品（20万付费用户，ARPU $49/月）开启跨处理器重试 + Smart Retries 组合：<br><br>
+        月续费失败率从 <span class="highlight hl-blue">6.8% → 2.2%</span>（降低 4.6个百分点），换算为每月 <span class="highlight hl-blue">额外挽回约 $45万</span> MRR，年化 <span class="highlight hl-blue">约 $540万</span> ARR 保留。</div>
+      </div>
+    </div>
+
+    <div class="feature-module fm-purple" style="margin-bottom: 0;">
+      <div class="fm-header">
+        <div class="fm-icon icon-purple">📊</div>
+        <div class="fm-title">
+          <h3>场景六：PSP 谈判筹码与供应商多元化</h3>
+          <p>有了切换能力，谈判费率的底气大不一样</p>
+        </div>
+      </div>
+      <div class="effect-case ec-purple" style="margin-bottom: 0;">
+        <div class="ec-label">实际案例</div>
+        <div class="ec-desc">年处理量 $2亿的电商平台，接入 Orchestration 后向 Stripe 提出费率谈判：<br><br>
+        「我们已接好 Adyen，可随时切流量」——凭借可验证的多处理器能力，成功将 Stripe 费率从 <span class="highlight hl-purple">2.9%+$0.30 谈至 2.5%+$0.25</span>，年节省手续费 <span class="highlight hl-purple">约 $100万</span>（仅谈判本身的 ROI 就足以覆盖接入成本）。</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════ COMPARISON TABLE -->
+  <div class="section-header">
+    <div class="section-icon icon-red">⚖️</div>
+    <div>
+      <h2>Stripe Orchestration vs 独立编排平台对比</h2>
+      <div class="section-desc">选型参考：Stripe 原生编排 vs Primer/Spreedly 等独立编排平台</div>
+    </div>
+  </div>
+
+  <div style="overflow-x: auto; margin-bottom: 32px;">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>维度</th>
+          <th>Stripe Orchestration（原生）</th>
+          <th>Primer / Spreedly 等独立编排层</th>
+          <th>ConfluxAPI（基于Stripe Connect）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:#e2e8f0; font-weight:600;">集成复杂度</td>
+          <td><span class="badge badge-green">低</span> — Dashboard 配置，无额外 API</td>
+          <td><span class="badge badge-amber">中</span> — 需独立接入编排层 API</td>
+          <td><span class="badge badge-blue">中</span> — 基于现有 Stripe 账户扩展</td>
+        </tr>
+        <tr>
+          <td style="color:#e2e8f0; font-weight:600;">支持处理器数</td>
+          <td><span class="badge badge-amber">有限</span> — 主流 PSP（私有预览中）</td>
+          <td><span class="badge badge-green">100+</span> — 覆盖长尾 PSP</td>
+          <td><span class="badge badge-blue">60+</span> — PSP 覆盖较广</td>
+        </tr>
+        <tr>
+          <td style="color:#e2e8f0; font-weight:600;">AI 优化能力</td>
+          <td><span class="badge badge-green">强</span> — Authorization Boost 深度集成</td>
+          <td><span class="badge badge-amber">中</span> — 部分平台有 ML 路由</td>
+          <td><span class="badge badge-blue">中</span> — 依赖 Stripe 底层能力</td>
+        </tr>
+        <tr>
+          <td style="color:#e2e8f0; font-weight:600;">访问门槛</td>
+          <td><span class="badge badge-amber">私有预览</span> — 需申请</td>
+          <td><span class="badge badge-green">公开</span> — 直接开通</td>
+          <td><span class="badge badge-green">公开</span> — 直接使用</td>
+        </tr>
+        <tr>
+          <td style="color:#e2e8f0; font-weight:600;">数据一致性</td>
+          <td><span class="badge badge-green">最强</span> — Stripe 统一持有 token</td>
+          <td><span class="badge badge-blue">良好</span> — 通用令牌化</td>
+          <td><span class="badge badge-blue">良好</span> — Stripe Connect 体系内</td>
+        </tr>
+        <tr>
+          <td style="color:#e2e8f0; font-weight:600;">退款管理</td>
+          <td><span class="badge badge-green">统一</span> — Stripe Dashboard/API</td>
+          <td><span class="badge badge-amber">部分统一</span></td>
+          <td><span class="badge badge-green">统一</span></td>
+        </tr>
+        <tr>
+          <td style="color:#e2e8f0; font-weight:600;">适用规模</td>
+          <td>中大型商户（年处理 $1000万+）</td>
+          <td>各规模均适用，尤其超大型</td>
+          <td>已用 Stripe 且需扩展的商户</td>
+        </tr>
+        <tr>
+          <td style="color:#e2e8f0; font-weight:600;">推荐场景</td>
+          <td>Stripe 现有客户、希望最小化集成改造</td>
+          <td>需对接大量本地/长尾 PSP 的超大型企业</td>
+          <td>Stripe 用户希望以最低成本扩展多 PSP</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════════ HOW TO ACCESS -->
+  <div class="section-header">
+    <div class="section-icon icon-teal">🚪</div>
+    <div>
+      <h2>如何获取访问权限 & 接入路径</h2>
+      <div class="section-desc">Payment Orchestration 当前处于私有预览阶段，以下是接入步骤</div>
+    </div>
+  </div>
+
+  <div class="overview-grid">
+    <div class="overview-card" style="border-color: rgba(99,102,241,0.2);">
+      <div class="oc-icon">📧</div>
+      <h4>Step 1：申请访问</h4>
+      <p>前往 Stripe Dashboard 的 Payments → Orchestration 页面，填写邮箱地址申请私有预览访问权限。Stripe 会优先向年处理量 $1000万以上的商户开放。</p>
+    </div>
+    <div class="overview-card" style="border-color: rgba(99,102,241,0.2);">
+      <div class="oc-icon">⚙️</div>
+      <h4>Step 2：接入外部处理器</h4>
+      <p>在 Stripe 后台配置需要接入的外部处理器账户（如 Adyen、Checkout.com 等），完成 API 凭证对接。Stripe 会自动建立跨处理器的 token 映射体系。</p>
+    </div>
+    <div class="overview-card" style="border-color: rgba(99,102,241,0.2);">
+      <div class="oc-icon">📋</div>
+      <h4>Step 3：创建路由规则</h4>
+      <p>在 Dashboard 的 Orchestration 页面，通过可视化界面创建路由规则，设置条件（卡片国家/货币/金额等）和动作（路由至指定处理器/重试策略）。</p>
+    </div>
+    <div class="overview-card" style="border-color: rgba(99,102,241,0.2);">
+      <div class="oc-icon">📊</div>
+      <h4>Step 4：监控与优化</h4>
+      <p>规则上线后，通过 Dashboard 的统一监控页面实时跟踪各处理器的授权率、成本和重试效果，持续优化路由策略，驱动支付成功率提升。</p>
+    </div>
+  </div>
+
+  <div class="callout callout-warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-text">
+      <strong>当前状态提示：</strong>Payment Orchestration 目前处于 <strong>Private Preview（私有预览）</strong>阶段，未全面公开。适合向 Stripe 客户成功团队主动申请，尤其是有明确多处理器需求或全球扩张计划的中大型商户，申请通过率更高。正式 GA（全面可用）时间尚未公布。
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ FOOTER -->
+<div class="footer">
+  <strong>Stripe Payment Orchestration 深度解析报告</strong> &nbsp;·&nbsp;
+  数据来源：Stripe 官方文档（docs.stripe.com/payments/orchestration）·  Stripe Sessions 2025 · 行业研究报告 &nbsp;·&nbsp;
+  生成时间：2026年6月1日 &nbsp;·&nbsp;
+  部分数字为参考量级，实际效果因商户规模和行业差异而不同
+</div>
+
+</body>
+</html>
