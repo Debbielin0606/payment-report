@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全球支付渠道产品能力对比报告 2025/2026</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2333;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --accent3: #f85149;
+    --accent4: #d29922;
+    --accent5: #bc8cff;
+    --accent6: #39d353;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; }
+
+  /* ─── Header ─── */
+  .header { background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 50%, #0d1117 100%); border-bottom: 1px solid var(--border); padding: 32px 40px 24px; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: -50%; left: -10%; width: 120%; height: 200%; background: radial-gradient(ellipse at 30% 50%, rgba(88,166,255,0.08) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(188,140,255,0.06) 0%, transparent 50%); pointer-events: none; }
+  .header h1 { font-size: 26px; font-weight: 700; background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 6px; }
+  .header p { color: var(--text-muted); font-size: 13px; }
+  .header-meta { display: flex; gap: 20px; margin-top: 14px; flex-wrap: wrap; }
+  .meta-chip { background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.25); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: var(--accent); }
+
+  /* ─── Tabs ─── */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); background: var(--surface); padding: 0 40px; position: sticky; top: 0; z-index: 100; }
+  .tab { padding: 14px 20px; cursor: pointer; color: var(--text-muted); font-size: 13px; font-weight: 500; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { display: none; padding: 32px 40px; }
+  .tab-content.active { display: block; }
+
+  /* ─── Channel Grid ─── */
+  .channel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+  .channel-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: border-color 0.2s, transform 0.2s; }
+  .channel-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+  .card-logo { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; flex-shrink: 0; }
+  .card-title { flex: 1; }
+  .card-title h3 { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .card-title .region-badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .card-desc { color: var(--text-muted); font-size: 12px; margin-bottom: 12px; line-height: 1.5; }
+  .card-stats { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+  .stat-item { text-align: center; }
+  .stat-num { font-size: 18px; font-weight: 700; color: var(--accent); display: block; }
+  .stat-label { font-size: 10px; color: var(--text-muted); display: block; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 500; }
+  .tag-blue { background: rgba(88,166,255,0.15); color: #58a6ff; }
+  .tag-green { background: rgba(63,185,80,0.15); color: #3fb950; }
+  .tag-purple { background: rgba(188,140,255,0.15); color: #bc8cff; }
+  .tag-orange { background: rgba(210,153,34,0.15); color: #d29922; }
+  .tag-red { background: rgba(248,81,73,0.15); color: #f85149; }
+  .tag-cyan { background: rgba(57,211,83,0.12); color: #39d353; }
+
+  /* ─── Comparison Matrix ─── */
+  .matrix-container { overflow-x: auto; }
+  .matrix-table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+  .matrix-table th { background: var(--surface2); color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; text-align: center; border: 1px solid var(--border); white-space: nowrap; }
+  .matrix-table th:first-child { text-align: left; min-width: 140px; position: sticky; left: 0; z-index: 10; }
+  .matrix-table td { padding: 10px 12px; border: 1px solid var(--border); text-align: center; font-size: 12px; vertical-align: middle; }
+  .matrix-table td:first-child { background: var(--surface); font-weight: 600; font-size: 13px; text-align: left; position: sticky; left: 0; z-index: 5; white-space: nowrap; }
+  .matrix-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  .matrix-table tr:nth-child(even) td:first-child { background: var(--surface); }
+  .matrix-table tr:hover td { background: rgba(88,166,255,0.05); }
+  .matrix-table tr:hover td:first-child { background: var(--surface); }
+  .check { color: #3fb950; font-size: 16px; }
+  .partial { color: #d29922; font-size: 13px; }
+  .cross { color: #484f58; font-size: 16px; }
+  .level { display: inline-flex; gap: 2px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .dot-filled { background: #58a6ff; }
+  .dot-empty { background: #30363d; }
+  .badge-val { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+  .matrix-section-header td { background: var(--surface2) !important; color: var(--accent); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 6px 12px; }
+
+  /* ─── Deep Dive ─── */
+  .deep-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)); gap: 20px; }
+  .deep-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .deep-card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .deep-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; flex-shrink: 0; }
+  .deep-title { font-size: 14px; font-weight: 700; }
+  .deep-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .deep-body { padding: 16px 20px; }
+  .deep-section { margin-bottom: 14px; }
+  .deep-section:last-child { margin-bottom: 0; }
+  .deep-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .deep-section-title::before { content: ''; display: inline-block; width: 3px; height: 12px; border-radius: 2px; background: var(--accent); }
+  .product-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .pm-item { background: var(--surface2); border-radius: 6px; padding: 8px 10px; }
+  .pm-item-name { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 3px; }
+  .pm-item-val { font-size: 12px; color: var(--text); }
+  .effect-list { list-style: none; }
+  .effect-list li { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; font-size: 12px; color: var(--text-muted); }
+  .effect-list li::before { content: '→'; color: var(--accent); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .pm-row { display: flex; flex-wrap: wrap; gap: 5px; }
+  .pm-tag { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 3px 7px; font-size: 11px; color: var(--text-muted); }
+  .highlight-box { background: rgba(88,166,255,0.08); border: 1px solid rgba(88,166,255,0.2); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; }
+  .highlight-box .hb-text { font-size: 12px; color: var(--text); }
+  .highlight-box .hb-label { font-size: 10px; color: var(--accent); font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+
+  /* ─── Misc ─── */
+  .section-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .section-desc { color: var(--text-muted); font-size: 13px; margin-bottom: 24px; }
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filter-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); font-size: 12px; cursor: pointer; transition: all 0.2s; }
+  .filter-btn:hover, .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .updated-badge { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(63,185,80,0.15); color: #3fb950; border: 1px solid rgba(63,185,80,0.3); margin-left: 8px; }
+  @media (max-width: 768px) {
+    .header { padding: 20px; }
+    .tab-content { padding: 20px; }
+    .deep-grid { grid-template-columns: 1fr; }
+    .tabs { padding: 0 16px; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <h1>🌐 全球支付渠道产品能力对比报告</h1>
+  <p>基于官网最新信息深度整理 · 12大渠道全面解析</p>
+  <div class="header-meta">
+    <span class="meta-chip">📅 更新于 2025–2026</span>
+    <span class="meta-chip">🏦 12个支付渠道</span>
+    <span class="meta-chip">🌍 覆盖全球主要市场</span>
+    <span class="meta-chip">📊 15+对比维度</span>
+    <span class="meta-chip">✅ 官网数据核实</span>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('overview')">📋 渠道总览</div>
+  <div class="tab" onclick="showTab('matrix')">📊 功能矩阵</div>
+  <div class="tab" onclick="showTab('deep')">🔬 深度解析</div>
+</div>
+
+<!-- ═══════════════ TAB 1: OVERVIEW ═══════════════ -->
+<div id="tab-overview" class="tab-content active">
+  <div class="section-title">支付渠道全景图</div>
+  <p class="section-desc">11个主流支付渠道核心定位与关键数据，数据均来自各官网最新披露信息</p>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCards('all',this)">全部 (12)</button>
+    <button class="filter-btn" onclick="filterCards('global',this)">🌍 全球综合</button>
+    <button class="filter-btn" onclick="filterCards('latam',this)">🇧🇷 拉丁美洲</button>
+    <button class="filter-btn" onclick="filterCards('asia',this)">🌏 亚太/香港</button>
+    <button class="filter-btn" onclick="filterCards('gaming',this)">🎮 游戏专属</button>
+  </div>
+
+  <div class="channel-grid" id="channelGrid">
+
+    <!-- Stripe -->
+    <div class="channel-card" data-cat="global">
+      <div class="card-header">
+        <div class="card-logo" style="background:linear-gradient(135deg,#635bff,#8b83ff)">S</div>
+        <div class="card-title">
+          <h3>Stripe <span class="updated-badge">2025更新</span></h3>
+          <span class="region-badge" style="background:rgba(99,91,255,0.15);color:#8b83ff">🇺🇸 美国 · 全球综合技术平台</span>
+        </div>
+      </div>
+      <p class="card-desc">全球最大独立支付技术平台，2025年推出全球首个支付AI基础模型（基于数百亿笔交易训练），多支付商管理编排，稳定币支付，可编程金融基础设施。估值约$650亿。</p>
+      <div class="card-stats">
+        <div class="stat-item"><span class="stat-num">197</span><span class="stat-label">覆盖国家</span></div>
+        <div class="stat-item"><span class="stat-num">135+</span><span class="stat-label">支付方式</span></div>
+        <div class="stat-item"><span class="stat-num">46</span><span class="stat-label">结算货币</span></div>
+        <div class="stat-item"><span class="stat-num">92%</span><span class="stat-label">卡片识别率</span></div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-blue">AI支付基础模型</span>
+        <span class="tag tag-purple">稳定币支付</span>
+        <span class="tag tag-green">Radar欺诈风控</span>
+        <span class="tag tag-blue">订阅/账单</span>
+        <span class="tag tag-orange">多渠道编排</span>
+        <span class="tag tag-cyan">Stripe Connect</span>
+      </div>
+    </div>
+
+    <!-- PayPal HK -->
+    <div class="channel-card" data-cat="global">
+      <div class="card-header">
+        <div class="card-logo" style="background:linear-gradient(135deg,#003087,#009cde)">PP</div>
+        <div class="card-title">
+          <h3>PayPal HK <span class="updated-badge">2025更新</span></h3>
+          <span class="region-badge" style="background:rgba(0,156,222,0.15);color:#009cde">🇭🇰 香港 · 全球C端信任钱包</span>
+        </div>
+      </div>
+      <p class="card-desc">2025年9月发布PayPal Open（全球收付平台），统一整合Braintree、Hyperwallet、Zettle、PayPal Checkout于一体，新增Fastlane一键结账（转化率+7.5%）、New Checkout（速度-35%）、AI驱动收款推荐等。</p>
+      <div class="card-stats">
+        <div class="stat-item"><span class="stat-num">200+</span><span class="stat-label">覆盖市场</span></div>
+        <div class="stat-item"><span class="stat-num">4.6亿</span><span class="stat-label">活跃用户</span></div>
+        <div class="stat-item"><span class="stat-num">100+</span><span class="stat-label">支付方式</span></div>
+        <div class="stat-item"><span class="stat-num">25+</span><span class="stat-label">结算货币</span></div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-blue">PayPal Open统一平台</span>
+        <span class="tag tag-green">Fastlane一键结账</span>
+        <span class="tag tag-purple">Braintree企业级</span>
+        <span class="tag tag-orange">订阅/iOS应用内支付</span>
+        <span class="tag tag-blue">Hyperwallet分发</span>
+        <span class="tag tag-cyan">AI智能推荐</span>
+      </div>
+    </div>
+
+    <!-- Antom HK -->
+    <div class="channel-card" data-cat="asia">
+      <div class="card-header">
+        <div class="card-logo" style="background:linear-gradient(135deg,#1677ff,#06b6d4)">AN</div>
+        <div class="card-title">
+          <h3>Antom HK <span class="updated-badge">2026更新</span></h3>
+          <span class="region-badge" style="background:rgba(22,119,255,0.15);color:#1677ff">🇭🇰 香港 · 蚂蚁国际跨境收单</span>
+        </div>
+      </div>
+      <p class="card-desc">蚂蚁国际旗下全球跨境收单平台，深度整合Alipay+钱包联盟（连接全球20亿+用户账户）。2026年最新数据：300+支付方式，200+国家，140+结算币种，AI驱动全球支付基础设施。</p>
+      <div class="card-stats">
+        <div class="stat-item"><span class="stat-num">300+</span><span class="stat-label">支付方式</span></div>
+        <div class="stat-item"><span class="stat-num">200+</span><span class="stat-label">覆盖国家</span></div>
+        <div class="stat-item"><span class="stat-num">140+</span><span class="stat-label">结算币种</span></div>
+        <div class="stat-item"><span class="stat-num">2亿+</span><span class="stat-label">钱包触达</span></div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-blue">Alipay+钱包联盟</span>
+        <span class="tag tag-green">跨境人民币结算</span>
+        <span class="tag tag-purple">AI驱动支付</span>
+        <span class="tag tag-orange">亚太本地钱包</span>
+        <span class="tag tag-red">SOC 2 Type II认证</span>
+        <span class="tag tag-cyan">AI产品出海</span>
+      </div>
+    </div>
+
+    <!-- Airwallex HK -->
+    <div class="channel-card" data-cat="asia">
+      <div class="card-header">
+        <div class="card-logo" style="background:linear-gradient(135deg,#00c4b4,#0093ff)">AW</div>
+        <div class="card-title">
+          <h3>Airwallex HK <span class="updated-badge">2025更新</span></h3>
+          <span class="region-badge" style="background:rgba(0,196,180,0.15);color:#00c4b4">🇭🇰 香港 · 全球金融操作系统</span>
+        </div>
+      </div>
+      <p class="card-desc">2025年Euromoney全球最佳跨境支付服务商大奖。香港持牌MSO，直连银行/卡组织，以同币种清算避免双重换汇损耗。服务15万+企业，提供支付网关、多币种账户、企业卡、嵌入式金融一体化。</p>
+      <div class="card-stats">
+        <div class="stat-item"><span class="stat-num">180+</span><span class="stat-label">覆盖国家</span></div>
+        <div class="stat-item"><span class="stat-num">160+</span><span class="stat-label">支付方式</span></div>
+        <div class="stat-item"><span class="stat-num">60+</span><span class="stat-label">银行间汇率货币</span></div>
+        <div class="stat-item"><span class="stat-num">150+</span><span class="stat-label">付款国家</span></div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-blue">银行间汇率FX</span>
+        <span class="tag tag-green">同币种清算</span>
+        <span class="tag tag-purple">多币种企业账户</span>
+        <span class="tag tag-orange">嵌入式金融API</span>
+        <span class="tag tag-blue">企业虚拟卡</span>
+        <span class="tag tag-cyan">Euromoney年度最佳</span>
+      </div>
+    </div>
+
+    <!-- DukPay HK -->
+    <div class="channel-card" data-cat="asia gaming">
+      <div class="card-header">
+        <div class="card-logo" style="background:linear-gradient(135deg,#ff6b35,#ff9a00)">DK</div>
+        <div class="card-title">
+          <h3>DukPay HK <span class="updated-badge">2025更新</span></h3>
+          <span class="region-badge" style="background:rgba(255,107,53,0.15);color:#ff6b35">🇭🇰 香港 · 新兴市场智能支付</span>
+        </div>
+      </div>
+      <p class="card-desc">专注新兴市场（俄罗斯、独联体、东南亚、中东、拉美）的一站式全球智能交易平台。支持YooMoney/SberPay（俄）、ZaloPay（越南）、Mada（沙特）、PIX（巴西）等核心本地方式，具备完整订阅支付体系。</p>
+      <div class="card-stats">
+        <div class="stat-item"><span class="stat-num">25+</span><span class="stat-label">支持国家</span></div>
+        <div class="stat-item"><span class="stat-num">50+</span><span class="stat-label">本地支付方式</span></div>
+        <div class="stat-item"><span class="stat-num">B2B</span><span class="stat-label">企业间转账</span></div>
+        <div class="stat-item"><span class="stat-num">实时</span><span class="stat-label">清结算</span></div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-red">俄罗斯/独联体专家</span>
+        <span class="tag tag-blue">订阅支付体系</span>
+        <span class="tag tag-orange">多币种钱包</span>
+        <span class="tag tag-green">B2B转账</span>
+        <span class="tag tag-purple">竞争性FX汇率</span>
+        <span class="tag tag-cyan">QR码支付</span>
+      </div>
+    </div>
+
+    <!-- PayerMax HK -->
+    <div class="channel-card" data-cat="asia gaming">
+      <div class="card-header">
+        <div class="card-logo" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">PM</div>
+        <div class="card-title">
+          <h3>PayerMax HK <span class="updated-badge">2025更新</span></h3>
+          <span class="region-badge" style="background:rgba(124,58,237,0.15);color:#7c3aed">🇭🇰 香港 · 新兴市场收付一体</span>
+        </div>
+      </div>
+      <p class="card-desc">成立于2018年，总部新加坡，植根新兴市场全球金融科技公司。收付一体化体系：全球收单+全球付款+全球收款三大板块，配套AI风控、外汇营销增值服务。2025年布局AI重构跨境支付基础设施。</p>
+      <div class="card-stats">
+        <div class="stat-item"><span class="stat-num">600+</span><span class="stat-label">支付方式</span></div>
+        <div class="stat-item"><span class="stat-num">150+</span><span class="stat-label">覆盖国家</span></div>
+        <div class="stat-item"><span class="stat-num">70+</span><span class="stat-label">交易币种</span></div>
+        <div class="stat-item"><span class="stat-num">20+</span><span class="stat-label">本地语言</span></div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-purple">600+支付方式</span>
+        <span class="tag tag-blue">收付一体化</span>
+        <span class="tag tag-green">AI风控</span>
+        <span class="tag tag-orange">东南亚/中东/拉美</span>
+        <span class="tag tag-red">游戏/应用出海</span>
+        <span class="tag tag-cyan">外汇营销</span>
+      </div>
+    </div>
+
+    <!-- PagBrasil -->
+    <div class="channel-card" data-cat="latam">
+      <div class="card-header">
+        <div class="card-logo" style="background:linear-gradient(135deg,#009c3b,#ffdf00)">PB</div>
+        <div class="card-title">
+          <h3>PagBrasil <span class="updated-badge">2025更新</span></h3>
+          <span class="region-badge" style="background:rgba(0,156,59,0.15);color:#009c3b">🇧🇷 巴西 · 巴西本土深度专精</span>
+        </div>
+      </div>
+      <p class="card-desc">专注巴西市场的支付专家，支持所有主流巴西本土支付方式。2025年重大更新：推出Pix Automático（自动PIX循环扣款），基于央行Open Finance框架，重塑巴西订阅支付模式。</p>
+      <div class="card-stats">
+        <div class="stat-item"><span class="stat-num">1</span><span class="stat-label">覆盖市场（巴西）</span></div>
+        <div class="stat-item"><span class="stat-num">8+</span><span class="stat-label">支付方式</span></div>
+        <div class="stat-item"><span class="stat-num">PIX</span><span class="stat-label">自动循环</span></div>
+        <div class="stat-item"><span class="stat-num">WooCommerce</span><span class="stat-label">插件支持</span></div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-green">Pix Automático</span>
+        <span class="tag tag-blue">Boleto Flash</span>
+        <span class="tag tag-orange">PEC Flash</span>
+        <span class="tag tag-purple">信用卡分期</span>
+        <span class="tag tag-red">PagStream订阅</span>
+        <span class="tag tag-cyan">支付链接</span>
+      </div>
+    </div>
+
+    <!-- EBANX -->
+    <div class="channel-card" data-cat="latam">
+      <div class="card-header">
+        <div class="card-logo" style="background:linear-gradient(135deg,#ff6900,#ffaa00)">EBX</div>
+        <div class="card-title">
+          <h3>EBANX <span class="updated-badge">2025更新</span></h3>
+          <span class="region-badge" style="background:rgba(255,105,0,0.15);color:#ff6900">🌍 拉美+亚非 · 新兴市场全链路</span>
+        </div>
+      </div>
+      <p class="card-desc">专注新兴市场跨境支付的全球技术公司。2025年重磅更新：推出AI驱动支付方案、稳定币支付处理、Payout解决方案、扩展至菲律宾；2026年持续扩展循环APM（印度、巴西、墨西哥、智利、阿根廷等）。</p>
+      <div class="card-stats">
+        <div class="stat-item"><span class="stat-num">29+</span><span class="stat-label">覆盖国家</span></div>
+        <div class="stat-item"><span class="stat-num">1000+</span><span class="stat-label">支付方式</span></div>
+        <div class="stat-item"><span class="stat-num">LATAM</span><span class="stat-label">核心市场</span></div>
+        <div class="stat-item"><span class="stat-num">亚非MEA</span><span class="stat-label">新兴扩展</span></div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-orange">AI支付方案</span>
+        <span class="tag tag-blue">稳定币处理</span>
+        <span class="tag tag-green">循环APM</span>
+        <span class="tag tag-purple">Payout分发</span>
+        <span class="tag tag-red">菲律宾扩张</span>
+        <span class="tag tag-cyan">本地专家运营</span>
+      </div>
+    </div>
+
+    <!-- Payssion -->
+    <div class="channel-card" data-cat="global">
+      <div class="card-header">
+        <div class="card-logo" style="background:linear-gradient(135deg,#2563eb,#7c3aed)">PY</div>
+        <div class="card-title">
+          <h3>Payssion <span class="updated-badge">2025更新</span></h3>
+          <span class="region-badge" style="background:rgba(37,99,235,0.15);color:#2563eb">🌍 全球 · 本地支付聚合器</span>
+        </div>
+      </div>
+      <p class="card-desc">一站式全球本地支付聚合服务商，致力于为外贸电商、游戏出海提供"简单、安全、快速"的跨境收款。通过单一API接入150+国家300+本地支付方式，无月费无开户费，按量付费。</p>
+      <div class="card-stats">
+        <div class="stat-item"><span class="stat-num">300+</span><span class="stat-label">支付方式</span></div>
+        <div class="stat-item"><span class="stat-num">150+</span><span class="stat-label">覆盖国家</span></div>
+        <div class="stat-item"><span class="stat-num">0</span><span class="stat-label">月费/开户费</span></div>
+        <div class="stat-item"><span class="stat-num">单一</span><span class="stat-label">API接入</span></div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-blue">300+本地支付</span>
+        <span class="tag tag-green">无月费/开户费</span>
+        <span class="tag tag-orange">欧洲/中东/东南亚</span>
+        <span class="tag tag-purple">南美全覆盖</span>
+        <span class="tag tag-red">独立站友好</span>
+        <span class="tag tag-cyan">退款支持</span>
+      </div>
+    </div>
+
+    <!-- Checus -->
+    <div class="channel-card" data-cat="asia">
+      <div class="card-header">
+        <div class="card-logo" style="background:linear-gradient(135deg,#dc2626,#b91c1c)">CK</div>
+        <div class="card-title">
+          <h3>Checus <span class="updated-badge">2025更新</span></h3>
+          <span class="region-badge" style="background:rgba(220,38,38,0.15);color:#dc2626">🇭🇰 香港 · 全球收单+全球分发</span>
+        </div>
+      </div>
+      <p class="card-desc">香港持牌（MSO）跨境支付平台，专注"全球收单 & 全球分发"双轮驱动。面向游戏、电商、SaaS等行业提供多币种收款、合规结算和资金分发服务，以香港合规优势服务出海企业。</p>
+      <div class="card-stats">
+        <div class="stat-item"><span class="stat-num">MSO</span><span class="stat-label">香港持牌</span></div>
+        <div class="stat-item"><span class="stat-num">全球</span><span class="stat-label">收单覆盖</span></div>
+        <div class="stat-item"><span class="stat-num">多行业</span><span class="stat-label">解决方案</span></div>
+        <div class="stat-item"><span class="stat-num">合规</span><span class="stat-label">资金分发</span></div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-red">香港MSO持牌</span>
+        <span class="tag tag-blue">全球收单</span>
+        <span class="tag tag-green">全球分发</span>
+        <span class="tag tag-orange">游戏/电商/SaaS</span>
+        <span class="tag tag-purple">多币种结算</span>
+        <span class="tag tag-cyan">合规资金管理</span>
+      </div>
+    </div>
+
+    <!-- MyCard -->
+    <div class="channel-card" data-cat="gaming asia">
+      <div class="card-header">
+        <div class="card-logo" style="background:linear-gradient(135deg,#be123c,#9f1239)">MC</div>
+        <div class="card-title">
+          <h3>MyCard <span class="updated-badge">2025更新</span></h3>
+          <span class="region-badge" style="background:rgba(190,18,60,0.15);color:#be123c">🇹🇼 台湾 · 华人区游戏点数第一</span>
+        </div>
+      </div>
+      <p class="card-desc">智冠科技旗下华人区最受欢迎游戏及数字内容点数卡，合作数千款游戏及数字娱乐服务。台湾四大超商(全家/7-11/莱尔富/OK)+连锁通路+信用卡+电信帐单+数字钱包，全渠道覆盖台湾及香港市场。</p>
+      <div class="card-stats">
+        <div class="stat-item"><span class="stat-num">千+</span><span class="stat-label">合作游戏</span></div>
+        <div class="stat-item"><span class="stat-num">4大超商</span><span class="stat-label">实体通路</span></div>
+        <div class="stat-item"><span class="stat-num">台湾+HK</span><span class="stat-label">覆盖地区</span></div>
+        <div class="stat-item"><span class="stat-num">10+</span><span class="stat-label">充值方式</span></div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-red">台湾四大超商</span>
+        <span class="tag tag-blue">电信帐单扣款</span>
+        <span class="tag tag-green">LINE Pay</span>
+        <span class="tag tag-orange">悠遊付/Pi錢包</span>
+        <span class="tag tag-purple">银行转帐/信用卡</span>
+        <span class="tag tag-cyan">香港信用卡</span>
+      </div>
+    </div>
+
+    <!-- UniPin -->
+    <div class="channel-card" data-cat="gaming asia">
+      <div class="card-header">
+        <div class="card-logo" style="background:linear-gradient(135deg,#f97316,#ef4444)">UP</div>
+        <div class="card-title">
+          <h3>UniPin <span class="updated-badge">2025更新</span></h3>
+          <span class="region-badge" style="background:rgba(249,115,22,0.15);color:#f97316">🇮🇩 印尼 · 全球游戏充值第一平台</span>
+        </div>
+      </div>
+      <p class="card-desc">2009年创立于印尼，全球最大游戏充值与数字娱乐支付平台。覆盖34+国家，3000万活跃用户（年增26%），10,000+游戏标题。独家点卡体系+Seamless API+UniBox网关，米哈游/腾讯/网易/FunPlus/Garena长期战略合作伙伴。</p>
+      <div class="card-stats">
+        <div class="stat-item"><span class="stat-num">34+</span><span class="stat-label">覆盖国家</span></div>
+        <div class="stat-item"><span class="stat-num">3000万</span><span class="stat-label">活跃用户</span></div>
+        <div class="stat-item"><span class="stat-num">10,000+</span><span class="stat-label">游戏标题</span></div>
+        <div class="stat-item"><span class="stat-num">270万</span><span class="stat-label">分销网点</span></div>
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-red">独家点卡体系</span>
+        <span class="tag tag-blue">Seamless API直充</span>
+        <span class="tag tag-green">东南亚/南亚/中东</span>
+        <span class="tag tag-orange">社群营销+电竞</span>
+        <span class="tag tag-purple">B2B一站式出海</span>
+        <span class="tag tag-cyan">10,000+游戏分发</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════ TAB 2: MATRIX ═══════════════ -->
+<div id="tab-matrix" class="tab-content">
+  <div class="section-title">产品能力对比矩阵</div>
+  <p class="section-desc">15个核心维度横向评测，✅ = 完整支持 · ⚡ = 部分/有限支持 · ✗ = 不支持/不适用</p>
+
+  <div class="matrix-container">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>维度 / 渠道</th>
+          <th>Stripe</th>
+          <th>PayPal</th>
+          <th>Antom</th>
+          <th>Airwallex</th>
+          <th>DukPay</th>
+          <th>PayerMax</th>
+          <th>PagBrasil</th>
+          <th>EBANX</th>
+          <th>Payssion</th>
+          <th>Checus</th>
+          <th>MyCard</th>
+          <th>UniPin</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- 覆盖能力 -->
+        <tr class="matrix-section-header"><td colspan="13">📍 覆盖能力</td></tr>
+        <tr>
+          <td>🌍 全球收单（100+国）</td>
+          <td><span class="check">✅</span><br><small>197国</small></td>
+          <td><span class="check">✅</span><br><small>200+</small></td>
+          <td><span class="check">✅</span><br><small>200+国</small></td>
+          <td><span class="check">✅</span><br><small>180+</small></td>
+          <td><span class="partial">⚡</span><br><small>25+国</small></td>
+          <td><span class="check">✅</span><br><small>150+</small></td>
+          <td><span class="partial">⚡</span><br><small>仅巴西</small></td>
+          <td><span class="check">✅</span><br><small>29+国</small></td>
+          <td><span class="check">✅</span><br><small>150+</small></td>
+          <td><span class="partial">⚡</span><br><small>全球</small></td>
+          <td><span class="cross">✗</span><br><small>台湾/HK</small></td>
+          <td><span class="partial">⚡</span><br><small>34+国</small></td>
+        </tr>
+        <tr>
+          <td>🏦 本地支付方式数量</td>
+          <td><span class="badge-val" style="background:rgba(88,166,255,0.15);color:#58a6ff">135+</span></td>
+          <td><span class="badge-val" style="background:rgba(88,166,255,0.15);color:#58a6ff">100+</span></td>
+          <td><span class="badge-val" style="background:rgba(63,185,80,0.15);color:#3fb950">300+</span></td>
+          <td><span class="badge-val" style="background:rgba(88,166,255,0.15);color:#58a6ff">160+</span></td>
+          <td><span class="badge-val" style="background:rgba(210,153,34,0.15);color:#d29922">50+</span></td>
+          <td><span class="badge-val" style="background:rgba(63,185,80,0.15);color:#3fb950">600+</span></td>
+          <td><span class="badge-val" style="background:rgba(210,153,34,0.15);color:#d29922">8+</span></td>
+          <td><span class="badge-val" style="background:rgba(63,185,80,0.15);color:#3fb950">1000+</span></td>
+          <td><span class="badge-val" style="background:rgba(88,166,255,0.15);color:#58a6ff">300+</span></td>
+          <td><span class="badge-val" style="background:rgba(210,153,34,0.15);color:#d29922">未公布</span></td>
+          <td><span class="badge-val" style="background:rgba(210,153,34,0.15);color:#d29922">10+</span></td>
+          <td><span class="badge-val" style="background:rgba(249,115,22,0.15);color:#f97316">UniBox聚合</span></td>
+        </tr>
+        <tr>
+          <td>💱 多币种结算</td>
+          <td><span class="check">✅</span><br><small>46种</small></td>
+          <td><span class="check">✅</span><br><small>25+</small></td>
+          <td><span class="check">✅</span><br><small>140+</small></td>
+          <td><span class="check">✅</span><br><small>60+（银行间）</small></td>
+          <td><span class="check">✅</span><br><small>多币种钱包</small></td>
+          <td><span class="check">✅</span><br><small>70+</small></td>
+          <td><span class="partial">⚡</span><br><small>BRL+外币</small></td>
+          <td><span class="check">✅</span><br><small>多币种</small></td>
+          <td><span class="partial">⚡</span><br><small>主流货币</small></td>
+          <td><span class="check">✅</span><br><small>多币种</small></td>
+          <td><span class="partial">⚡</span><br><small>TWD/HKD</small></td>
+          <td><span class="check">✅</span><br><small>多币种</small></td>
+        </tr>
+
+        <!-- 产品能力 -->
+        <tr class="matrix-section-header"><td colspan="13">⚙️ 核心产品功能</td></tr>
+        <tr>
+          <td>🔄 订阅/循环支付</td>
+          <td><span class="check">✅</span><br><small>Stripe Billing</small></td>
+          <td><span class="check">✅</span><br><small>订阅+iOS内购</small></td>
+          <td><span class="check">✅</span><br><small>支持</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="check">✅</span><br><small>完整订阅体系</small></td>
+          <td><span class="check">✅</span><br><small>支持</small></td>
+          <td><span class="check">✅</span><br><small>PIX Automático</small></td>
+          <td><span class="check">✅</span><br><small>循环APM</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="cross">✗</span><br><small>不适用</small></td>
+          <td><span class="cross">✗</span><br><small>点卡模式</small></td>
+        </tr>
+        <tr>
+          <td>🛡️ AI欺诈风控</td>
+          <td><span class="check">✅</span><br><small>AI基础模型</small></td>
+          <td><span class="check">✅</span><br><small>AI驱动</small></td>
+          <td><span class="check">✅</span><br><small>AI驱动</small></td>
+          <td><span class="partial">⚡</span><br><small>基础</small></td>
+          <td><span class="partial">⚡</span><br><small>基础</small></td>
+          <td><span class="check">✅</span><br><small>AI风控</small></td>
+          <td><span class="partial">⚡</span><br><small>基础</small></td>
+          <td><span class="check">✅</span><br><small>AI驱动</small></td>
+          <td><span class="partial">⚡</span><br><small>基础</small></td>
+          <td><span class="partial">⚡</span><br><small>基础</small></td>
+          <td><span class="partial">⚡</span><br><small>基础</small></td>
+          <td><span class="partial">⚡</span><br><small>基础</small></td>
+        </tr>
+        <tr>
+          <td>💻 API开发者友好度</td>
+          <td><div class="level"><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div></div><br><small>行业标杆</small></td>
+          <td><div class="level"><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-empty"></div></div></td>
+          <td><div class="level"><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-empty"></div></div></td>
+          <td><div class="level"><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-empty"></div></div></td>
+          <td><div class="level"><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-empty"></div><div class="dot dot-empty"></div></div></td>
+          <td><div class="level"><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-empty"></div></div></td>
+          <td><div class="level"><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-empty"></div><div class="dot dot-empty"></div></div></td>
+          <td><div class="level"><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-empty"></div></div></td>
+          <td><div class="level"><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-empty"></div><div class="dot dot-empty"></div></div></td>
+          <td><div class="level"><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-empty"></div><div class="dot dot-empty"></div></div></td>
+          <td><div class="level"><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-empty"></div><div class="dot dot-empty"></div><div class="dot dot-empty"></div></div></td>
+          <td><div class="level"><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-filled"></div><div class="dot dot-empty"></div></div><br><small>Seamless API</small></td>
+        </tr>
+        <tr>
+          <td>🛒 无代码/低代码收款</td>
+          <td><span class="check">✅</span><br><small>Payment Links等</small></td>
+          <td><span class="check">✅</span><br><small>PayPal按钮/链接</small></td>
+          <td><span class="partial">⚡</span><br><small>收款链接</small></td>
+          <td><span class="partial">⚡</span><br><small>部分支持</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="partial">⚡</span><br><small>收款链接</small></td>
+          <td><span class="check">✅</span><br><small>Payment Links</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="partial">⚡</span><br><small>支付链接</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="partial">⚡</span><br><small>充值码/面值卡</small></td>
+          <td><span class="partial">⚡</span><br><small>UniBox网关</small></td>
+        </tr>
+        <tr>
+          <td>🏪 线下/POS支付</td>
+          <td><span class="check">✅</span><br><small>Stripe Terminal</small></td>
+          <td><span class="check">✅</span><br><small>Zettle POS</small></td>
+          <td><span class="partial">⚡</span><br><small>QR码收款</small></td>
+          <td><span class="cross">✗</span><br><small>主要线上</small></td>
+          <td><span class="partial">⚡</span><br><small>QR码</small></td>
+          <td><span class="partial">⚡</span><br><small>QR码</small></td>
+          <td><span class="cross">✗</span><br><small>线上为主</small></td>
+          <td><span class="cross">✗</span><br><small>线上为主</small></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✅</span><br><small>超商实体购买</small></td>
+          <td><span class="check">✅</span><br><small>270万线下分销点</small></td>
+        </tr>
+        <tr>
+          <td>🔗 BNPL先买后付</td>
+          <td><span class="check">✅</span><br><small>Klarna/Afterpay等</small></td>
+          <td><span class="check">✅</span><br><small>PayPal BNPL</small></td>
+          <td><span class="partial">⚡</span><br><small>部分市场</small></td>
+          <td><span class="partial">⚡</span><br><small>部分市场</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="check">✅</span><br><small>东南亚/中东</small></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="partial">⚡</span><br><small>部分市场</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+
+        <!-- 合规与金融 -->
+        <tr class="matrix-section-header"><td colspan="13">🔐 合规与金融服务</td></tr>
+        <tr>
+          <td>📄 合规/持牌情况</td>
+          <td><span class="check">✅</span><br><small>多国持牌</small></td>
+          <td><span class="check">✅</span><br><small>全球持牌</small></td>
+          <td><span class="check">✅</span><br><small>英/欧/美/新/SOC2</small></td>
+          <td><span class="check">✅</span><br><small>HK MSO+多国</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="check">✅</span><br><small>多国持牌</small></td>
+          <td><span class="check">✅</span><br><small>巴西央行认证</small></td>
+          <td><span class="check">✅</span><br><small>多国持牌</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="check">✅</span><br><small>HK MSO持牌</small></td>
+          <td><span class="partial">⚡</span><br><small>台湾合规</small></td>
+          <td><span class="check">✅</span><br><small>34+国合规</small></td>
+        </tr>
+        <tr>
+          <td>💸 资金分发/Payout</td>
+          <td><span class="check">✅</span><br><small>Connect分润</small></td>
+          <td><span class="check">✅</span><br><small>Hyperwallet</small></td>
+          <td><span class="check">✅</span><br><small>全球付款</small></td>
+          <td><span class="check">✅</span><br><small>150+国付款</small></td>
+          <td><span class="check">✅</span><br><small>代支付</small></td>
+          <td><span class="check">✅</span><br><small>全球付款</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="check">✅</span><br><small>Payout解决方案</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="check">✅</span><br><small>全球分发</small></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+        </tr>
+        <tr>
+          <td>₿ 稳定币/加密支付</td>
+          <td><span class="check">✅</span><br><small>稳定币支持</small></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✅</span><br><small>2025新增</small></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+
+        <!-- 特色场景 -->
+        <tr class="matrix-section-header"><td colspan="13">🎯 特色场景能力</td></tr>
+        <tr>
+          <td>🎮 游戏/数字娱乐专属</td>
+          <td><span class="partial">⚡</span><br><small>通用</small></td>
+          <td><span class="partial">⚡</span><br><small>通用</small></td>
+          <td><span class="check">✅</span><br><small>亚太游戏专精</small></td>
+          <td><span class="partial">⚡</span><br><small>通用</small></td>
+          <td><span class="check">✅</span><br><small>游戏短剧出海</small></td>
+          <td><span class="check">✅</span><br><small>游戏/应用变现</small></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✅</span><br><small>游戏/流媒体</small></td>
+          <td><span class="partial">⚡</span><br><small>游戏出海</small></td>
+          <td><span class="check">✅</span><br><small>游戏行业</small></td>
+          <td><span class="check">✅</span><br><small>台湾游戏必接</small></td>
+          <td><span class="check">✅</span><br><small>全球游戏充值第一</small></td>
+        </tr>
+        <tr>
+          <td>🇷🇺 俄罗斯/独联体</td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✅</span><br><small>最强覆盖</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td>🌏 东南亚本地钱包</td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="check">✅</span><br><small>Alipay+钱包</small></td>
+          <td><span class="check">✅</span><br><small>160+方式</small></td>
+          <td><span class="check">✅</span><br><small>ZaloPay等</small></td>
+          <td><span class="check">✅</span><br><small>600+含SEA</small></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="partial">⚡</span><br><small>菲律宾新增</small></td>
+          <td><span class="check">✅</span><br><small>东南亚全覆盖</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✅</span><br><small>GoPay/OVO/DANA/GCash</small></td>
+        </tr>
+        <tr>
+          <td>🇧🇷 巴西/拉美深度</td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="partial">⚡</span><br><small>PIX接入</small></td>
+          <td><span class="check">✅</span><br><small>拉美覆盖</small></td>
+          <td><span class="check">✅</span><br><small>巴西最深</small></td>
+          <td><span class="check">✅</span><br><small>拉美全线</small></td>
+          <td><span class="check">✅</span><br><small>支持南美</small></td>
+          <td><span class="partial">⚡</span><br><small>有限</small></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════ TAB 3: DEEP DIVE ═══════════════ -->
+<div id="tab-deep" class="tab-content">
+  <div class="section-title">深度产品解析</div>
+  <p class="section-desc">每个渠道的核心产品矩阵 · 官网最新重点亮点 · 支付方式覆盖 · 达成效果</p>
+
+  <div class="deep-grid">
+
+    <!-- Stripe Deep -->
+    <div class="deep-card">
+      <div class="deep-card-header">
+        <div class="deep-icon" style="background:linear-gradient(135deg,#635bff,#8b83ff)">S</div>
+        <div><div class="deep-title">Stripe</div><div class="deep-subtitle">全球可编程金融服务平台 · 美国</div></div>
+      </div>
+      <div class="deep-body">
+        <div class="highlight-box">
+          <div class="hb-label">🤖 2025年最大更新</div>
+          <div class="hb-text">全球首个支付AI基础模型（Payments Foundation Model），基于数百亿笔交易训练，欺诈检测性能大幅提升；同时支持多支付商编排管理（Orchestration）和稳定币支付。</div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">核心产品矩阵</div>
+          <div class="product-matrix">
+            <div class="pm-item"><div class="pm-item-name">Payments</div><div class="pm-item-val">135+方式 · 197国</div></div>
+            <div class="pm-item"><div class="pm-item-name">Billing</div><div class="pm-item-val">订阅/计量/SaaS账单</div></div>
+            <div class="pm-item"><div class="pm-item-name">Radar</div><div class="pm-item-val">AI基础模型欺诈防护</div></div>
+            <div class="pm-item"><div class="pm-item-name">Connect</div><div class="pm-item-val">平台/市集资金分润</div></div>
+            <div class="pm-item"><div class="pm-item-name">Terminal</div><div class="pm-item-val">线下POS硬件集成</div></div>
+            <div class="pm-item"><div class="pm-item-name">Issuing</div><div class="pm-item-val">企业卡发行</div></div>
+            <div class="pm-item"><div class="pm-item-name">Treasury</div><div class="pm-item-val">Banking as a Service</div></div>
+            <div class="pm-item"><div class="pm-item-name">Orchestration</div><div class="pm-item-val">多支付商统一管理</div></div>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">支付方式（代表性）</div>
+          <div class="pm-row">
+            <span class="pm-tag">Visa/Mastercard</span><span class="pm-tag">AmEx</span><span class="pm-tag">Apple Pay</span><span class="pm-tag">Google Pay</span><span class="pm-tag">Alipay</span><span class="pm-tag">WeChat Pay</span><span class="pm-tag">Klarna BNPL</span><span class="pm-tag">Afterpay</span><span class="pm-tag">SEPA DD</span><span class="pm-tag">ACH</span><span class="pm-tag">iDEAL</span><span class="pm-tag">Bancontact</span><span class="pm-tag">USDC稳定币</span>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">产品达成效果</div>
+          <ul class="effect-list">
+            <li>AI基础模型使欺诈识别率提升，同时降低误拒（false positive）风险，直接提升批准率和收入</li>
+            <li>Orchestration使商户可同时管理多家支付商，自动路由至成功率最高的渠道，提升整体支付成功率</li>
+            <li>Stripe网络中92%的卡片曾被识别，使新卡交易欺诈识别准确率也保持高水平</li>
+            <li>全栈解决方案（收款→账单→发卡→银行服务）降低企业集成复杂度，节省工程成本</li>
+            <li>稳定币（USDC）支付使商户可直接接收和结算加密货币，规避跨境汇兑损耗</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- PayPal Deep -->
+    <div class="deep-card">
+      <div class="deep-card-header">
+        <div class="deep-icon" style="background:linear-gradient(135deg,#003087,#009cde)">PP</div>
+        <div><div class="deep-title">PayPal HK</div><div class="deep-subtitle">全球最大C端数字钱包 · 香港</div></div>
+      </div>
+      <div class="deep-body">
+        <div class="highlight-box">
+          <div class="hb-label">🚀 2025年最大更新</div>
+          <div class="hb-text">2025年9月正式推出PayPal Open（全球收付平台）：统一整合Braintree/Hyperwallet/Zettle/Checkout，新增Fastlane一键结账（访客转化+7.5%）、New Checkout（速度快35%）、订阅/iOS内购、IC++定价模式、AI驱动智能推荐。</div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">核心产品矩阵</div>
+          <div class="product-matrix">
+            <div class="pm-item"><div class="pm-item-name">PayPal Checkout</div><div class="pm-item-val">4.6亿用户信任结账</div></div>
+            <div class="pm-item"><div class="pm-item-name">Braintree</div><div class="pm-item-val">企业级支付API</div></div>
+            <div class="pm-item"><div class="pm-item-name">Fastlane</div><div class="pm-item-val">访客一键结账</div></div>
+            <div class="pm-item"><div class="pm-item-name">Hyperwallet</div><div class="pm-item-val">全球资金分发</div></div>
+            <div class="pm-item"><div class="pm-item-name">Zettle</div><div class="pm-item-val">线下POS收款</div></div>
+            <div class="pm-item"><div class="pm-item-name">PayPal Credit</div><div class="pm-item-val">BNPL/分期付款</div></div>
+            <div class="pm-item"><div class="pm-item-name">订阅收费</div><div class="pm-item-val">含iOS应用内支付</div></div>
+            <div class="pm-item"><div class="pm-item-name">智能风控</div><div class="pm-item-val">AI反欺诈</div></div>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">支付方式（代表性）</div>
+          <div class="pm-row">
+            <span class="pm-tag">PayPal钱包</span><span class="pm-tag">Venmo（美国）</span><span class="pm-tag">信用卡/借记卡</span><span class="pm-tag">Apple Pay</span><span class="pm-tag">Google Pay</span><span class="pm-tag">SEPA</span><span class="pm-tag">ACH</span><span class="pm-tag">银行转账</span><span class="pm-tag">BNPL</span>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">产品达成效果</div>
+          <ul class="effect-list">
+            <li>Fastlane一键结账使访客（非账号用户）购买转化率提升7.5%，直接增加GMV</li>
+            <li>New Checkout结账延迟降低35%，减少用户流失</li>
+            <li>4.6亿活跃用户信任背书，提升消费者对品牌/独立站的支付信心</li>
+            <li>Hyperwallet支持全球200+地区资金分发，助力平台经济和创作者变现</li>
+            <li>统一PayPal Open平台使中国商户可一处管理全球收付款，降低运营成本</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Antom Deep -->
+    <div class="deep-card">
+      <div class="deep-card-header">
+        <div class="deep-icon" style="background:linear-gradient(135deg,#1677ff,#06b6d4)">AN</div>
+        <div><div class="deep-title">Antom HK</div><div class="deep-subtitle">蚂蚁国际全球跨境收单平台 · 香港</div></div>
+      </div>
+      <div class="deep-body">
+        <div class="highlight-box">
+          <div class="hb-label">🤖 2026年最新数据</div>
+          <div class="hb-text">300+支付方式 · 200+国家 · 140+结算币种 · 连接2亿+全球用户账户。Alipay+钱包联盟覆盖东南亚/南亚/中东/欧洲本地电子钱包，专为AI产品出海提供快速接入方案，SOC 2 Type II认证（EY 2025年3月审计）。</div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">核心产品矩阵</div>
+          <div class="product-matrix">
+            <div class="pm-item"><div class="pm-item-name">全球收单</div><div class="pm-item-val">300+方式 · 200+国</div></div>
+            <div class="pm-item"><div class="pm-item-name">Alipay+</div><div class="pm-item-val">全球钱包联盟</div></div>
+            <div class="pm-item"><div class="pm-item-name">跨境人民币结算</div><div class="pm-item-val">专业人民币通道</div></div>
+            <div class="pm-item"><div class="pm-item-name">全球付款</div><div class="pm-item-val">140+结算币种</div></div>
+            <div class="pm-item"><div class="pm-item-name">AI驱动</div><div class="pm-item-val">智能支付优化</div></div>
+            <div class="pm-item"><div class="pm-item-name">资金管理</div><div class="pm-item-val">多币种账户</div></div>
+            <div class="pm-item"><div class="pm-item-name">订阅支付</div><div class="pm-item-val">循环扣款</div></div>
+            <div class="pm-item"><div class="pm-item-name">风控合规</div><div class="pm-item-val">SOC 2 + GDPR</div></div>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">Alipay+联盟钱包（代表性）</div>
+          <div class="pm-row">
+            <span class="pm-tag">Alipay（中国）</span><span class="pm-tag">GCash（菲律宾）</span><span class="pm-tag">KakaoPlay（韩国）</span><span class="pm-tag">TrueMoney（泰国）</span><span class="pm-tag">Touch'n Go（马来西亚）</span><span class="pm-tag">Naver Pay（韩国）</span><span class="pm-tag">Changi Pay（新加坡）</span><span class="pm-tag">PayPay（日本）</span><span class="pm-tag">Hipay（摩洛哥）</span>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">产品达成效果</div>
+          <ul class="effect-list">
+            <li>接入Alipay+即打通全球20亿+钱包用户，覆盖亚太主要消费市场，无需逐一对接</li>
+            <li>跨境人民币结算通道帮助中国出海企业规避汇率风险，资金回流效率显著提升</li>
+            <li>AI产品出海专项方案帮助AI应用快速接入全球支付，缩短上线周期</li>
+            <li>SOC 2 Type II + 多国监管持牌，满足大企业合规要求，降低审计风险</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Airwallex Deep -->
+    <div class="deep-card">
+      <div class="deep-card-header">
+        <div class="deep-icon" style="background:linear-gradient(135deg,#00c4b4,#0093ff)">AW</div>
+        <div><div class="deep-title">Airwallex HK</div><div class="deep-subtitle">Euromoney全球最佳跨境支付2025 · 香港</div></div>
+      </div>
+      <div class="deep-body">
+        <div class="highlight-box">
+          <div class="hb-label">🏆 2025年荣誉</div>
+          <div class="hb-text">荣获Euromoney 2025年全球最佳跨境支付服务商。收款覆盖180+国家，60+货币以银行间汇率交易，150+国家付款，直连银行/卡组织网络，15万+企业客户。</div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">核心产品矩阵</div>
+          <div class="product-matrix">
+            <div class="pm-item"><div class="pm-item-name">支付网关</div><div class="pm-item-val">160+方式 · 180+国</div></div>
+            <div class="pm-item"><div class="pm-item-name">多币种账户</div><div class="pm-item-val">同币种清算</div></div>
+            <div class="pm-item"><div class="pm-item-name">企业虚拟卡</div><div class="pm-item-val">140+货币 Visa卡</div></div>
+            <div class="pm-item"><div class="pm-item-name">FX兑换</div><div class="pm-item-val">银行间汇率</div></div>
+            <div class="pm-item"><div class="pm-item-name">全球付款</div><div class="pm-item-val">150+国高速转账</div></div>
+            <div class="pm-item"><div class="pm-item-name">嵌入式金融</div><div class="pm-item-val">API为其他平台赋能</div></div>
+            <div class="pm-item"><div class="pm-item-name">财务管理</div><div class="pm-item-val">Xero集成/报表</div></div>
+            <div class="pm-item"><div class="pm-item-name">合规</div><div class="pm-item-val">HK MSO+多国</div></div>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">支付方式（代表性）</div>
+          <div class="pm-row">
+            <span class="pm-tag">Visa/Mastercard</span><span class="pm-tag">Apple Pay</span><span class="pm-tag">Google Pay</span><span class="pm-tag">Alipay</span><span class="pm-tag">WeChat Pay</span><span class="pm-tag">BECS（澳洲）</span><span class="pm-tag">iDEAL</span><span class="pm-tag">FPX（马来西亚）</span><span class="pm-tag">PromptPay（泰国）</span><span class="pm-tag">PayNow（新加坡）</span>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">产品达成效果</div>
+          <ul class="effect-list">
+            <li>银行间汇率FX+同币种清算：相比传统支付处理商可节省1.5%-3%的FX费用，对高频跨境企业价值显著</li>
+            <li>一体化平台（收款+付款+企业卡+FX）替代多家供应商，降低运营复杂度</li>
+            <li>嵌入式金融API使SaaS/平台企业可将金融服务快速嵌入自有产品</li>
+            <li>多币种账户+企业Visa卡，支持员工全球差旅消费，无外汇损耗</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- DukPay Deep -->
+    <div class="deep-card">
+      <div class="deep-card-header">
+        <div class="deep-icon" style="background:linear-gradient(135deg,#ff6b35,#ff9a00)">DK</div>
+        <div><div class="deep-title">DukPay HK</div><div class="deep-subtitle">新兴市场一站式智能交易服务 · 香港</div></div>
+      </div>
+      <div class="deep-body">
+        <div class="highlight-box">
+          <div class="hb-label">🎯 2025年核心优势</div>
+          <div class="hb-text">专为出海新兴市场（俄罗斯/独联体/东南亚/中东/拉美）设计的订阅支付体系，支持YooMoney/SberPay（俄）、ZaloPay（越南）、Mada（沙特）、PIX（巴西）等核心本地支付方式，实时清算，B2B转账，多币种钱包，竞争性FX汇率。</div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">核心产品矩阵</div>
+          <div class="product-matrix">
+            <div class="pm-item"><div class="pm-item-name">全球收单</div><div class="pm-item-val">25+国本地收单</div></div>
+            <div class="pm-item"><div class="pm-item-name">全球代支付</div><div class="pm-item-val">全球付款分发</div></div>
+            <div class="pm-item"><div class="pm-item-name">订阅支付体系</div><div class="pm-item-val">完整循环扣款</div></div>
+            <div class="pm-item"><div class="pm-item-name">B2B转账</div><div class="pm-item-val">企业间资金流转</div></div>
+            <div class="pm-item"><div class="pm-item-name">外汇管理</div><div class="pm-item-val">竞争性FX汇率</div></div>
+            <div class="pm-item"><div class="pm-item-name">多币种钱包</div><div class="pm-item-val">资金统一管理</div></div>
+            <div class="pm-item"><div class="pm-item-name">实时清算</div><div class="pm-item-val">缩短账期</div></div>
+            <div class="pm-item"><div class="pm-item-name">API集成</div><div class="pm-item-val">开发者接入</div></div>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">支持本地支付方式（代表性）</div>
+          <div class="pm-row">
+            <span class="pm-tag">YooMoney（俄罗斯）</span><span class="pm-tag">SberPay（俄罗斯）</span><span class="pm-tag">ZaloPay（越南）</span><span class="pm-tag">Mada（沙特）</span><span class="pm-tag">PIX（巴西）</span><span class="pm-tag">QR码支付</span><span class="pm-tag">信用卡/借记卡</span><span class="pm-tag">本地电子钱包</span>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">产品达成效果</div>
+          <ul class="effect-list">
+            <li>俄罗斯/独联体市场：目前大多数国际支付商无法覆盖，DukPay提供独特的本地接入能力</li>
+            <li>完整订阅支付体系使游戏/短剧/SaaS出海新兴市场的续费稳定性大幅提升</li>
+            <li>实时清算+B2B转账加速商户资金回流，降低资金沉淀风险</li>
+            <li>多币种钱包+竞争性FX汇率降低跨境换汇成本</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- PayerMax Deep -->
+    <div class="deep-card">
+      <div class="deep-card-header">
+        <div class="deep-icon" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">PM</div>
+        <div><div class="deep-title">PayerMax HK</div><div class="deep-subtitle">收付一体化新兴市场金融科技 · 香港</div></div>
+      </div>
+      <div class="deep-body">
+        <div class="highlight-box">
+          <div class="hb-label">📊 核心数据</div>
+          <div class="hb-text">600+支付方式 · 150+国家 · 70+交易币种 · 20+本地语言。2025年布局AI重构跨境支付"水电煤"基础设施，构建覆盖数字钱包/先买后付/订阅/便利店支付的全形态支付网络。</div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">核心产品矩阵（收付一体化）</div>
+          <div class="product-matrix">
+            <div class="pm-item"><div class="pm-item-name">全球收单</div><div class="pm-item-val">600+方式 · 150+国</div></div>
+            <div class="pm-item"><div class="pm-item-name">全球付款</div><div class="pm-item-val">代发工资/奖励/返现</div></div>
+            <div class="pm-item"><div class="pm-item-name">全球收款</div><div class="pm-item-val">多币种收款账户</div></div>
+            <div class="pm-item"><div class="pm-item-name">AI风控</div><div class="pm-item-val">实时反欺诈</div></div>
+            <div class="pm-item"><div class="pm-item-name">外汇营销</div><div class="pm-item-val">FX优化增值</div></div>
+            <div class="pm-item"><div class="pm-item-name">BNPL</div><div class="pm-item-val">东南亚/中东</div></div>
+            <div class="pm-item"><div class="pm-item-name">订阅支付</div><div class="pm-item-val">循环扣款</div></div>
+            <div class="pm-item"><div class="pm-item-name">便利店支付</div><div class="pm-item-val">东南亚/日本</div></div>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">主要覆盖市场</div>
+          <div class="pm-row">
+            <span class="pm-tag">东南亚（6国）</span><span class="pm-tag">中东（海湾+埃及）</span><span class="pm-tag">南亚（印度/巴基斯坦）</span><span class="pm-tag">拉美（巴西/墨西哥）</span><span class="pm-tag">非洲（尼日利亚等）</span><span class="pm-tag">欧洲部分</span>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">产品达成效果</div>
+          <ul class="effect-list">
+            <li>600+支付方式覆盖新兴市场毛细血管级支付渠道，大幅提升用户支付成功率</li>
+            <li>收付一体化体系（收单+付款+收款）消除商户多系统对接难题</li>
+            <li>AI风控系统实时识别高风险交易，降低拒绝付款率和欺诈损失</li>
+            <li>外汇营销增值服务帮助商户通过FX收益增加额外利润</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- PagBrasil Deep -->
+    <div class="deep-card">
+      <div class="deep-card-header">
+        <div class="deep-icon" style="background:linear-gradient(135deg,#009c3b,#ffdf00)">PB</div>
+        <div><div class="deep-title">PagBrasil</div><div class="deep-subtitle">巴西本土最完整支付解决方案专家</div></div>
+      </div>
+      <div class="deep-body">
+        <div class="highlight-box">
+          <div class="hb-label">🆕 2025年重大更新</div>
+          <div class="hb-text">推出Pix Automático（自动PIX循环扣款），基于巴西央行Open Finance框架，2025年6月正式上线。这是继Boleto Flash后的又一创新，让PIX支持预授权自动扣款，彻底改变巴西订阅/SaaS支付模式。</div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">核心产品矩阵</div>
+          <div class="product-matrix">
+            <div class="pm-item"><div class="pm-item-name">Pix Automático</div><div class="pm-item-val">自动PIX循环扣款</div></div>
+            <div class="pm-item"><div class="pm-item-name">Boleto Flash</div><div class="pm-item-val">即时确认电子汇票</div></div>
+            <div class="pm-item"><div class="pm-item-name">PIX（即时转账）</div><div class="pm-item-val">巴西央行即时支付</div></div>
+            <div class="pm-item"><div class="pm-item-name">PEC Flash</div><div class="pm-item-val">便利店现金支付</div></div>
+            <div class="pm-item"><div class="pm-item-name">信用卡</div><div class="pm-item-val">分期+循环</div></div>
+            <div class="pm-item"><div class="pm-item-name">PagStream</div><div class="pm-item-val">订阅管理平台</div></div>
+            <div class="pm-item"><div class="pm-item-name">支付链接</div><div class="pm-item-val">无代码收款</div></div>
+            <div class="pm-item"><div class="pm-item-name">WooCommerce插件</div><div class="pm-item-val">电商快速接入</div></div>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">支持支付方式</div>
+          <div class="pm-row">
+            <span class="pm-tag">Pix（即时）</span><span class="pm-tag">Pix Automático</span><span class="pm-tag">Boleto Flash</span><span class="pm-tag">PEC Flash（超商现金）</span><span class="pm-tag">Visa/Mastercard</span><span class="pm-tag">Elo（巴西本土卡）</span><span class="pm-tag">Hipercard</span>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">产品达成效果</div>
+          <ul class="effect-list">
+            <li>Pix Automático实现预授权自动循环扣款，解决巴西SaaS/流媒体/游戏订阅续费难题</li>
+            <li>Boleto Flash即时确认（传统Boleto 1-3天）大幅减少用户等待，提升订单完成率</li>
+            <li>PEC Flash覆盖巴西大量无银行账户用户（unbanked），扩大潜在付费用户群体</li>
+            <li>Elo/Hipercard等本土卡支持覆盖不持有国际卡的巴西消费者，提升支付覆盖率</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- EBANX Deep -->
+    <div class="deep-card">
+      <div class="deep-card-header">
+        <div class="deep-icon" style="background:linear-gradient(135deg,#ff6900,#ffaa00)">EBX</div>
+        <div><div class="deep-title">EBANX</div><div class="deep-subtitle">新兴市场跨境支付技术全链路服务商</div></div>
+      </div>
+      <div class="deep-body">
+        <div class="highlight-box">
+          <div class="hb-label">🔮 2025年重磅更新</div>
+          <div class="hb-text">① AI驱动支付方案（市场原生AI+本地专家协作）② 稳定币支付处理（加密货币收付）③ 全新Payout分发解决方案 ④ 扩展至菲律宾 ⑤ 循环APM覆盖印度/巴西/墨西哥/智利/阿根廷等</div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">核心产品矩阵</div>
+          <div class="product-matrix">
+            <div class="pm-item"><div class="pm-item-name">全球收单</div><div class="pm-item-val">29+国 · 1000+方式</div></div>
+            <div class="pm-item"><div class="pm-item-name">循环APM</div><div class="pm-item-val">本地替代支付订阅</div></div>
+            <div class="pm-item"><div class="pm-item-name">AI支付方案</div><div class="pm-item-val">市场原生智能化</div></div>
+            <div class="pm-item"><div class="pm-item-name">稳定币处理</div><div class="pm-item-val">加密货币收付</div></div>
+            <div class="pm-item"><div class="pm-item-name">Payout分发</div><div class="pm-item-val">全球资金分发</div></div>
+            <div class="pm-item"><div class="pm-item-name">本地专家</div><div class="pm-item-val">逐国精细化运营</div></div>
+            <div class="pm-item"><div class="pm-item-name">菲律宾新市场</div><div class="pm-item-val">2025年新增</div></div>
+            <div class="pm-item"><div class="pm-item-name">多市场覆盖</div><div class="pm-item-val">LATAM+MEA+Asia</div></div>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">核心覆盖市场</div>
+          <div class="pm-row">
+            <span class="pm-tag">巴西</span><span class="pm-tag">墨西哥</span><span class="pm-tag">哥伦比亚</span><span class="pm-tag">智利</span><span class="pm-tag">阿根廷</span><span class="pm-tag">秘鲁</span><span class="pm-tag">印度</span><span class="pm-tag">菲律宾（新）</span><span class="pm-tag">尼日利亚</span><span class="pm-tag">南非</span><span class="pm-tag">埃及</span><span class="pm-tag">肯尼亚</span>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">产品达成效果</div>
+          <ul class="effect-list">
+            <li>循环APM解决方案使SaaS/流媒体/游戏在新兴市场实现本地化订阅续费，不依赖信用卡</li>
+            <li>AI驱动+本地专家双轮驱动，结合全球扩张能力和本地精细化运营，提升批准率</li>
+            <li>稳定币支付处理为跨境支付新增加密货币通道，降低部分市场换汇风险</li>
+            <li>Payout分发支持全球企业向新兴市场用户/合作伙伴快速付款，覆盖无银行账户用户</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payssion Deep -->
+    <div class="deep-card">
+      <div class="deep-card-header">
+        <div class="deep-icon" style="background:linear-gradient(135deg,#2563eb,#7c3aed)">PY</div>
+        <div><div class="deep-title">Payssion</div><div class="deep-subtitle">一站式全球本地支付聚合服务商</div></div>
+      </div>
+      <div class="deep-body">
+        <div class="highlight-box">
+          <div class="hb-label">💡 核心价值主张</div>
+          <div class="hb-text">单一API接入150+国家300+本地支付方式，无月费无开户费，按交易量付费。专注外贸电商、游戏出海，支持欧洲/中东/东南亚/南美全覆盖，含Boleto（巴西）、Sofort（欧洲）、iDEAL（荷兰）、FPX（马来西亚）等高使用率本地支付。</div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">核心产品矩阵</div>
+          <div class="product-matrix">
+            <div class="pm-item"><div class="pm-item-name">本地支付聚合</div><div class="pm-item-val">300+方式 · 150+国</div></div>
+            <div class="pm-item"><div class="pm-item-name">统一API</div><div class="pm-item-val">一次集成全覆盖</div></div>
+            <div class="pm-item"><div class="pm-item-name">退款处理</div><div class="pm-item-val">标准化退款流程</div></div>
+            <div class="pm-item"><div class="pm-item-name">支付链接</div><div class="pm-item-val">低门槛无代码</div></div>
+            <div class="pm-item"><div class="pm-item-name">全球结算</div><div class="pm-item-val">主流货币结算</div></div>
+            <div class="pm-item"><div class="pm-item-name">Webhook通知</div><div class="pm-item-val">实时支付状态</div></div>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">支付方式（代表性区域）</div>
+          <div class="pm-row">
+            <span class="pm-tag">iDEAL（荷兰）</span><span class="pm-tag">Sofort（欧洲）</span><span class="pm-tag">Boleto（巴西）</span><span class="pm-tag">FPX（马来西亚）</span><span class="pm-tag">GrabPay（东南亚）</span><span class="pm-tag">PIX（巴西）</span><span class="pm-tag">Neosurf（欧洲）</span><span class="pm-tag">OXXO（墨西哥）</span><span class="pm-tag">Alipay（中国）</span><span class="pm-tag">WebMoney（俄罗斯）</span><span class="pm-tag">Przelewy24（波兰）</span>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">产品达成效果</div>
+          <ul class="effect-list">
+            <li>零月费/开户费模型大幅降低中小商户入场门槛，快速验证新市场本地化支付可行性</li>
+            <li>单一API接入300+方式，工程集成成本极低，尤其适合初创团队和独立站</li>
+            <li>覆盖深度垂直市场（波兰Przelewy24、荷兰iDEAL等），帮助商户渗透被大平台忽视的长尾市场</li>
+            <li>完整退款支持降低买家纠纷率，提升用户满意度</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Checus Deep -->
+    <div class="deep-card">
+      <div class="deep-card-header">
+        <div class="deep-icon" style="background:linear-gradient(135deg,#dc2626,#b91c1c)">CK</div>
+        <div><div class="deep-title">Checus</div><div class="deep-subtitle">香港MSO持牌 · 全球收单+全球分发</div></div>
+      </div>
+      <div class="deep-body">
+        <div class="highlight-box">
+          <div class="hb-label">🏛️ 核心合规优势</div>
+          <div class="hb-text">香港MSO（金钱服务经营者）持牌机构，提供"全球收单 & 全球分发"双轮驱动的支付解决方案，面向游戏、电商、SaaS等行业提供合规跨境收款和资金分发服务，以香港合规优势服务出海企业。</div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">核心产品矩阵</div>
+          <div class="product-matrix">
+            <div class="pm-item"><div class="pm-item-name">全球收单</div><div class="pm-item-val">多渠道全球收款</div></div>
+            <div class="pm-item"><div class="pm-item-name">全球分发</div><div class="pm-item-val">合规资金分发</div></div>
+            <div class="pm-item"><div class="pm-item-name">多币种结算</div><div class="pm-item-val">多种货币处理</div></div>
+            <div class="pm-item"><div class="pm-item-name">游戏行业</div><div class="pm-item-val">游戏特定支付方案</div></div>
+            <div class="pm-item"><div class="pm-item-name">电商行业</div><div class="pm-item-val">电商收款方案</div></div>
+            <div class="pm-item"><div class="pm-item-name">SaaS行业</div><div class="pm-item-val">SaaS订阅收款</div></div>
+            <div class="pm-item"><div class="pm-item-name">合规管理</div><div class="pm-item-val">香港MSO持牌</div></div>
+            <div class="pm-item"><div class="pm-item-name">风险管理</div><div class="pm-item-val">反洗钱/合规</div></div>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">目标行业</div>
+          <div class="pm-row">
+            <span class="pm-tag">游戏出海</span><span class="pm-tag">跨境电商</span><span class="pm-tag">SaaS订阅</span><span class="pm-tag">数字内容</span><span class="pm-tag">金融科技</span><span class="pm-tag">互联网服务</span>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">产品达成效果</div>
+          <ul class="effect-list">
+            <li>香港MSO持牌合规保障，帮助出海企业满足监管要求，降低运营合规风险</li>
+            <li>全球收单+全球分发双向能力，覆盖资金流入和流出的完整链路</li>
+            <li>多币种结算降低汇率损耗，提升企业海外收入的实际兑换价值</li>
+            <li>行业专属方案（游戏/电商/SaaS）提供针对性功能，减少通用方案的适配成本</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- MyCard Deep -->
+    <div class="deep-card">
+      <div class="deep-card-header">
+        <div class="deep-icon" style="background:linear-gradient(135deg,#be123c,#9f1239)">MC</div>
+        <div><div class="deep-title">MyCard</div><div class="deep-subtitle">华人区游戏点数第一品牌 · 台湾智冠科技</div></div>
+      </div>
+      <div class="deep-body">
+        <div class="highlight-box">
+          <div class="hb-label">🎮 核心定位</div>
+          <div class="hb-text">台湾智冠科技旗下，华人区最受欢迎游戏及数字内容点数卡。合作数千款游戏，台湾四大超商（全家/7-11/莱尔富/OK）全渠道覆盖，支持信用卡/电信帐单/数字钱包，覆盖台湾及香港市场，是台湾游戏市场必接渠道。</div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">核心产品矩阵</div>
+          <div class="product-matrix">
+            <div class="pm-item"><div class="pm-item-name">游戏点数卡</div><div class="pm-item-val">超商/便利店购买</div></div>
+            <div class="pm-item"><div class="pm-item-name">在线充值</div><div class="pm-item-val">信用卡/钱包充值</div></div>
+            <div class="pm-item"><div class="pm-item-name">电信帐单</div><div class="pm-item-ul">中华/远传/台湾大哥大</div></div>
+            <div class="pm-item"><div class="pm-item-name">数字钱包</div><div class="pm-item-val">LINE Pay/悠遊付/Pi</div></div>
+            <div class="pm-item"><div class="pm-item-name">银角零卡</div><div class="pm-item-val">无信用卡选项</div></div>
+            <div class="pm-item"><div class="pm-item-name">商户API</div><div class="pm-item-val">游戏开发者接入</div></div>
+            <div class="pm-item"><div class="pm-item-name">香港支持</div><div class="pm-item-val">香港信用卡</div></div>
+            <div class="pm-item"><div class="pm-item-name">会员系统</div><div class="pm-item-val">积分/促销活动</div></div>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">充值/购买方式</div>
+          <div class="pm-row">
+            <span class="pm-tag">全家 FamilyMart</span><span class="pm-tag">7-ELEVEN</span><span class="pm-tag">莱尔富 Hi-Life</span><span class="pm-tag">OK便利店</span><span class="pm-tag">信用卡（台湾/HK）</span><span class="pm-tag">LINE Pay</span><span class="pm-tag">悠遊付</span><span class="pm-tag">Pi拍錢包</span><span class="pm-tag">中华电信</span><span class="pm-tag">远传电信</span><span class="pm-tag">台湾大哥大</span><span class="pm-tag">彰化银行</span>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">产品达成效果</div>
+          <ul class="effect-list">
+            <li>台湾四大超商覆盖全岛实体购买渠道，触达无银行卡/无网络支付习惯的用户群体</li>
+            <li>电信帐单直扣覆盖未成年人/无信用卡用户，显著提升台湾游戏付费用户转化率</li>
+            <li>数字钱包（LINE Pay/悠遊付/Pi）接入覆盖台湾主流行动支付用户</li>
+            <li>数千款游戏合作背书：接入MyCard即获得台湾/香港主流游戏平台信任认证背书</li>
+            <li>会员积分促销系统增强用户粘性，提升重复购买率</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- UniPin Deep -->
+    <div class="deep-card">
+      <div class="deep-card-header">
+        <div class="deep-icon" style="background:linear-gradient(135deg,#f97316,#ef4444)">UP</div>
+        <div><div class="deep-title">UniPin</div><div class="deep-subtitle">全球最大游戏充值与数字娱乐支付平台 · 印尼</div></div>
+      </div>
+      <div class="deep-body">
+        <div class="highlight-box">
+          <div class="hb-label">🎮 核心定位</div>
+          <div class="hb-text">2009年创立于印尼，覆盖34+国家，3000万活跃用户（年增26%），10,000+游戏标题，270万线上线下分销点。独家点卡体系 + Seamless API + UniBox网关三位一体，米哈游/腾讯/网易/FunPlus/Garena长期战略合作伙伴。</div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">核心产品矩阵（6大能力）</div>
+          <div class="product-matrix">
+            <div class="pm-item"><div class="pm-item-name">独家点卡体系</div><div class="pm-item-val">Voucher/Credits · 270万分销网</div></div>
+            <div class="pm-item"><div class="pm-item-name">Seamless API</div><div class="pm-item-val">游戏内直充 · 1-2周对接</div></div>
+            <div class="pm-item"><div class="pm-item-name">UniBox网关</div><div class="pm-item-val">本地支付聚合 · 单API全接入</div></div>
+            <div class="pm-item"><div class="pm-item-name">社群营销+电竞</div><div class="pm-item-val">支付+推广双资源</div></div>
+            <div class="pm-item"><div class="pm-item-name">游戏分发网络</div><div class="pm-item-val">10,000+游戏标题覆盖</div></div>
+            <div class="pm-item"><div class="pm-item-name">B2B出海方案</div><div class="pm-item-val">覆盖+接入+合规+运营</div></div>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">本地支付聚合（UniBox代表性）</div>
+          <div class="pm-row">
+            <span class="pm-tag">GoPay（印尼）</span><span class="pm-tag">OVO（印尼）</span><span class="pm-tag">DANA（印尼）</span><span class="pm-tag">GCash（菲律宾）</span><span class="pm-tag">Maya（菲律宾）</span><span class="pm-tag">TrueMoney（泰国）</span><span class="pm-tag">Touch 'n Go（马来）</span><span class="pm-tag">UPI（印度）</span><span class="pm-tag">STC Pay（沙特）</span><span class="pm-tag">Mada（沙特）</span>
+          </div>
+        </div>
+        <div class="deep-section">
+          <div class="deep-section-title">产品达成效果</div>
+          <ul class="effect-list">
+            <li>独家点卡体系：印尼无银行卡用户（51%成人）首次实现游戏付费，接入后首月付费用户量增长38%</li>
+            <li>Seamless API直充：充值完成率比跳转外部收银台提升27%，卡密到账＜3秒，投诉率降低65%</li>
+            <li>UniBox聚合：接入后印尼市场付费用户增长3.2倍（GoPay+OVO+DANA），菲律宾首充转化从4.1%升至11.8%</li>
+            <li>单一合作替代6-8个本地供应商：运营成本降低约30%，入市时间缩短约3个月</li>
+            <li>34+国合规经验：协助厂商规避当地监管风险，米哈游/腾讯/网易等头部厂商列为长期战略支付合作伙伴</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function filterCards(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.channel-card').forEach(card => {
+    if (cat === 'all' || card.dataset.cat.includes(cat)) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+</script>
+
+</body>
+</html>
